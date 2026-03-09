@@ -1,0 +1,13 @@
+# version: "3"
+# services:
+
+#    db:
+#      image: postgres:9.6
+#      restart: always
+#      environment:
+#        POSTGRES_PASSWORD: conectaPro
+#        POSTGRES_DB: conectaPro
+#      ports:
+#        - 5435:5435
+#      volumes:
+#        - ./postgres-data:/bitnami/postgresql/data
