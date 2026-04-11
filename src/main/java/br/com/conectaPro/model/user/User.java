@@ -24,20 +24,20 @@ import lombok.Setter;
 @NoArgsConstructor
 public class User extends AudibleEntity {
 
-    @Column
+    @Column(nullable = false, length = 100)
     private String name;
 
-    @Column
+    @Column(unique = true)
     private String email;
 
     @Column
     private String password; // Hash
 
-    @Column
-    private String cpf; // TODO: definir se vamos especializar cliente-profissional por conta do cnpj
+    @Column(unique = true)
+    private String cpf_cnpj; // TODO: definir se vamos especializar cliente-profissional por conta do cnpj
 
     @Column
-    private LocalDate bithDate;
+    private LocalDate birthDate;
 
     @Column
     private UserType userType;
