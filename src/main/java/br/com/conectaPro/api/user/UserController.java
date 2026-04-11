@@ -17,6 +17,7 @@ import java.util.List;
 
 import br.com.conectaPro.model.user.User;
 import br.com.conectaPro.model.user.UserService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/user")
@@ -26,7 +27,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping
-    public ResponseEntity<User> save(@RequestBody UserRequest request) {
+    public ResponseEntity<User> save(@RequestBody @Valid UserRequest request) {
 
         User user = userService.save(request.build());
         return new ResponseEntity<User>(user, HttpStatus.CREATED);
