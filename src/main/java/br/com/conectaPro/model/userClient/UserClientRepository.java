@@ -1,5 +1,7 @@
 package br.com.conectaPro.model.userClient;
 
-public class UserClientRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface UserClientRepository extends JpaRepository<UserClient, Long> {
     
 }

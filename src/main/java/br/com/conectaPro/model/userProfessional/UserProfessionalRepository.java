@@ -1,5 +1,7 @@
 package br.com.conectaPro.model.userProfessional;
 
-public class UserProfessionalRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface UserProfessionalRepository extends  JpaRepository<UserProfessional, Long>{
     
 }
