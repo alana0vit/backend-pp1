@@ -29,7 +29,7 @@ public class Demand extends AudibleEntity{
     private String title;
 
     @Column(nullable = false, length = 500)
-    private String descricao;
+    private String description;
 
     @Column
     private String imgUrl;
