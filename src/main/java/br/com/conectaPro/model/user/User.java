@@ -37,7 +37,13 @@ public class User extends AudibleEntity {
     private LocalDate birthDate;
 
     @Column
+    private String phone;
+
+    @Column
     private UserType userType;
+
+    @Column
+    private String registryId;
 
     @Column
     private Long addressId; // Address FK

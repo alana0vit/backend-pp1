@@ -36,7 +36,12 @@ public class UserRequest {
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate birthDate;
 
+    @Length(min =11, max = 20, message = "O campo Fone tem que ter entre {min} e {max} caracteres")
+    private String phone;
+
     private UserType userType;
+
+    private String registryId;
 
     private Long addressId;
 
@@ -49,7 +54,9 @@ public class UserRequest {
                 .email(email)
                 .password(password)
                 .birthDate(birthDate)
+                .phone(phone)
                 .userType(userType)
+                .registryId(registryId)
                 .addressId(addressId)
                 .active(active)
                 .build();
