@@ -9,13 +9,16 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import br.com.conectaPro.model.user.User;
 import br.com.conectaPro.model.user.UserType;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 
 @Data
 @Builder
@@ -28,19 +31,29 @@ public class UserRequest {
     @Length(max = 100, message = "O Nome deverá ter no máximo {max} caracteres")
     private String name;
 
+    @NotBlank()
     @Email
     private String email;
 
+    @NotBlank()
+    @Size(min=6, message="A senha deve ter no mínimo 6 caracteres")
     private String password;
 
     @JsonFormat(pattern = "dd/MM/yyyy")
+    @Past()
+    @NotNull()
     private LocalDate birthDate;
 
-    @Length(min =11, max = 20, message = "O campo Fone tem que ter entre {min} e {max} caracteres")
+    @NotBlank()
+    @Pattern(
+        regexp = "^\\d{10,11}$"
+    )
     private String phone;
 
+    @NotNull()
     private UserType userType;
 
+    @NotBlank()
     private String registryId;
 
     private Long addressId;

@@ -1,6 +1,4 @@
-package br.com.conectaPro.model.demand;
-
-import java.time.LocalDate;
+package br.com.conectaPro.model.address;
 
 import org.hibernate.annotations.SQLRestriction;
 
@@ -15,37 +13,37 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "Demand")
+@Table(name = "Address")
 @SQLRestriction("enabled = true")
 @Builder
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Demand extends AudibleEntity{
-
-    @Column(unique = true)
-    private String code;
-
-    @Column(nullable = false, length = 100)
-    private String title;
-
-    @Column(nullable = false, length = 500)
-    private String description;
+public class Address extends AudibleEntity {
 
     @Column
-    private String imgUrl;
+    private String street;
 
     @Column
-    private Long addressId;
+    private String number;
 
     @Column
-    private Long categoryId;
+    private String neighborhood;
 
     @Column
-    private Long clientId;
+    private String city;
 
     @Column
-    private Long professionalId;
+    private String state;
+
+    @Column
+    private String zipCode;
+
+    @Column
+    private Double latitude;
+
+    @Column
+    private Double longitude;
     
 }
