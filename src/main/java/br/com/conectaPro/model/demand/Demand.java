@@ -1,5 +1,7 @@
 package br.com.conectaPro.model.demand;
 
+import java.time.LocalDate;
+
 import org.hibernate.annotations.SQLRestriction;
 
 import br.com.conectaPro.util.entity.AudibleEntity;
@@ -33,6 +35,9 @@ public class Demand extends AudibleEntity{
 
     @Column
     private String imgUrl;
+
+    @Column
+    private LocalDate createdAt;
 
     @Column
     private Long addressId;

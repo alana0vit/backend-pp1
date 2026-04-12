@@ -37,6 +37,7 @@ public class DemandService {
         demand.setTitle(demandChanged.getTitle());
         demand.setDescription(demandChanged.getDescription());
         demand.setImgUrl(demandChanged.getImgUrl());
+        demand.setCreatedAt(demandChanged.getCreatedAt());
         demand.setAddressId(demandChanged.getAddressId());
         demand.setCategoryId(demandChanged.getCategoryId());
         demand.setClientId(demandChanged.getClientId());
