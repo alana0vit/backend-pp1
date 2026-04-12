@@ -8,16 +8,13 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import br.com.conectaPro.model.user.User;
 import br.com.conectaPro.model.user.UserType;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.br.CPF;
 
 
 @Data
@@ -37,11 +34,6 @@ public class UserRequest {
 
     private String password;
 
-    private String cpf_cnpj;
-    // João, não é melhor colocar cada um como atributo em cliente/profissional?
-    // ou fazer um enum com userType?
-    // até para usar o @CPF @CNPJ
-
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate birthDate;
 
@@ -57,7 +49,6 @@ public class UserRequest {
                 .name(name)
                 .email(email)
                 .password(password)
-                .cpf_cnpj(cpf_cnpj)
                 .birthDate(birthDate)
                 .userType(userType)
                 .addressId(addressId)

@@ -3,7 +3,6 @@ package br.com.conectaPro.model.demand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import br.com.conectaPro.model.demand.DemandRepository;
 import jakarta.transaction.Transactional;
 
 import java.util.List;

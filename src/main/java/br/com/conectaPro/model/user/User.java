@@ -33,9 +33,6 @@ public class User extends AudibleEntity {
     @Column
     private String password; // Hash
 
-    @Column(unique = true)
-    private String cpf_cnpj; // TODO: definir se vamos especializar cliente-profissional por conta do cnpj
-
     @Column
     private LocalDate birthDate;
 

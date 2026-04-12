@@ -1,11 +1,11 @@
 package br.com.conectaPro.model.user;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
-
-import java.util.List;
 
 @Service
 public class UserService {
@@ -37,7 +37,6 @@ public class UserService {
         user.setName(userChanged.getName());
         user.setEmail(userChanged.getEmail());
         user.setPassword(userChanged.getPassword());
-        user.setCpf_cnpj(userChanged.getCpf_cnpj());
         user.setBirthDate(userChanged.getBirthDate());
         user.setUserType(userChanged.getUserType());
         user.setAddressId(userChanged.getAddressId());
