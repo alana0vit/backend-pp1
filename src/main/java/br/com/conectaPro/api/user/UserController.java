@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import br.com.conectaPro.model.user.AddressUser;
 import br.com.conectaPro.model.user.User;
 import br.com.conectaPro.model.user.UserService;
 import jakarta.validation.Valid;
@@ -57,4 +58,30 @@ public class UserController {
         userService.delete(id);
         return ResponseEntity.ok().build();
     }
+
+    // Endereços
+
+    @PostMapping("/address/{userId}")
+    public ResponseEntity<AddressUser> postAddressUser(@PathVariable("userId") Long userId,
+            @RequestBody @Valid AddressUserRequest request) {
+
+        AddressUser address = userService.postAddressUser(userId, request.build());
+        return new ResponseEntity<AddressUser>(address, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/address/{addressId}")
+    public ResponseEntity<AddressUser> updateAddressUser(@PathVariable("addressId") Long addressId,
+            @RequestBody AddressUserRequest request) {
+
+        AddressUser address = userService.updateAddressUser(addressId, request.build());
+        return new ResponseEntity<AddressUser>(address, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/address/{addressId}")
+    public ResponseEntity<Void> deleteAddressUser(@PathVariable("addressId") Long addressId) {
+
+        userService.deleteAddressUser(addressId);
+        return ResponseEntity.noContent().build();
+    }
+
 }

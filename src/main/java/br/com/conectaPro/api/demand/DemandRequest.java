@@ -1,11 +1,7 @@
 package br.com.conectaPro.api.demand;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import br.com.conectaPro.model.demand.Demand;
 import jakarta.validation.constraints.*;
-
-import java.time.LocalDate;
 
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.URL;

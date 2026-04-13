@@ -1,18 +1,18 @@
-package br.com.conectaPro.api.address;
+package br.com.conectaPro.api.user;
 
-import br.com.conectaPro.model.address.Address;
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import br.com.conectaPro.model.user.AddressUser;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddressRequest {
+public class AddressUserRequest {
 
     @NotBlank(message = "A rua não é opcional")
     private String street;
@@ -39,9 +39,11 @@ public class AddressRequest {
 
     private Double longitude;
 
-    public Address build() {
+    private String supplement;
 
-        return Address.builder()
+    public AddressUser build() {
+
+        return AddressUser.builder()
                 .street(street)
                 .number(number)
                 .neighborhood(neighborhood)
@@ -50,7 +52,7 @@ public class AddressRequest {
                 .zipCode(zipCode)
                 .latitude(latitude)
                 .longitude(longitude)
+                .supplement(supplement)
                 .build();
     }
-    
 }

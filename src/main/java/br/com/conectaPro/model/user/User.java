@@ -1,12 +1,15 @@
 package br.com.conectaPro.model.user;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.hibernate.annotations.SQLRestriction;
 
 import br.com.conectaPro.util.entity.AudibleEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "User")
+@Table(name = "Users")
 @SQLRestriction("enabled = true")
 @Builder
 @Getter
@@ -45,8 +48,8 @@ public class User extends AudibleEntity {
     @Column
     private String registryId;
 
-    @Column
-    private Long addressId; // Address FK
+    @OneToMany(mappedBy="userId", orphanRemoval=true, fetch=FetchType.EAGER)
+    private List<AddressUser> addressId;
 
     @Column
     private Boolean active;

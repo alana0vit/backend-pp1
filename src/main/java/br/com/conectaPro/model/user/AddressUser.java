@@ -1,16 +1,18 @@
-package br.com.conectaPro.model.address;
+package br.com.conectaPro.model.user;
 
-import org.hibernate.annotations.SQLRestriction;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import br.com.conectaPro.util.entity.AudibleEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "Address")
@@ -20,7 +22,11 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Address extends AudibleEntity {
+public class AddressUser extends AudibleEntity {
+
+    @JsonIgnore
+    @ManyToOne
+    private User userId;
 
     @Column
     private String street;
@@ -45,5 +51,8 @@ public class Address extends AudibleEntity {
 
     @Column
     private Double longitude;
-    
+
+    @Column
+    private String supplement;
+
 }

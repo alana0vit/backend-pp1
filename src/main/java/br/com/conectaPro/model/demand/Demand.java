@@ -1,12 +1,11 @@
 package br.com.conectaPro.model.demand;
 
-import java.time.LocalDate;
-
 import org.hibernate.annotations.SQLRestriction;
 
 import br.com.conectaPro.util.entity.AudibleEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
