@@ -54,8 +54,6 @@ public class UserRequest {
 
     private List<AddressUser> addressId;
 
-    private Boolean active;
-
     public User build() {
 
         return User.builder()
@@ -67,7 +65,6 @@ public class UserRequest {
                 .userType(userType)
                 .registryId(registryId)
                 .addressId(addressId)
-                .active(active)
                 .build();
     }
 

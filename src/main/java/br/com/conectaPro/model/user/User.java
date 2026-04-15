@@ -51,7 +51,4 @@ public class User extends AudibleEntity {
     @OneToMany(mappedBy="userId", orphanRemoval=true, fetch=FetchType.EAGER)
     private List<AddressUser> addressId;
 
-    @Column
-    private Boolean active;
-
 }

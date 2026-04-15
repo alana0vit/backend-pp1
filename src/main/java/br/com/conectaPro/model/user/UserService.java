@@ -48,8 +48,6 @@ public class UserService {
         user.setUserType(userChanged.getUserType());
         user.setRegistryId(userChanged.getRegistryId());
         user.setAddressId(userChanged.getAddressId());
-        user.setActive(userChanged.getActive());
-
         repository.save(user);
     }
 
@@ -69,13 +67,9 @@ public class UserService {
 
         User user = this.getById(userId);
 
-        // Primeiro salva o AddressUser:
-
         address.setUserId(user);
         address.setEnabled(Boolean.TRUE);
         addressUserRepository.save(address);
-
-        // Depois acrescenta o endereço criado ao cliente e atualiza o cliente:
 
         List<AddressUser> listAddressUser = user.getAddressId();
 

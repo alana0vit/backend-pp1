@@ -2,10 +2,12 @@ package br.com.conectaPro.model.demand;
 
 import org.hibernate.annotations.SQLRestriction;
 
+import br.com.conectaPro.model.category.Category;
+import br.com.conectaPro.model.user.AddressUser;
+import br.com.conectaPro.model.user.User;
 import br.com.conectaPro.util.entity.AudibleEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,15 +38,15 @@ public class Demand extends AudibleEntity{
     private String imgUrl;
 
     @Column
-    private Long addressId;
+    private AddressUser addressId;
 
     @Column
-    private Long categoryId;
+    private Category categoryId;
 
     @Column
-    private Long clientId;
+    private User clientId;
 
     @Column
-    private Long professionalId;
+    private User professionalId;
     
 }
