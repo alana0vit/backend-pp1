@@ -41,10 +41,10 @@ public class DemandRequest {
     private Long categoryId;
 
     @NotNull()
-    private User clientId;
+    private Long clientId;
 
     @NotNull
-    private User professionalId;
+    private Long professionalId;
 
     public Demand build() {
 
