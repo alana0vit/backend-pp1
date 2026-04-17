@@ -1,16 +1,13 @@
 package br.com.conectaPro.api.demand;
 
-import br.com.conectaPro.model.category.Category;
-import br.com.conectaPro.model.demand.Demand;
-import br.com.conectaPro.model.user.AddressUser;
-import br.com.conectaPro.model.user.User;
-import jakarta.validation.constraints.*;
-
-import java.util.List;
-
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.URL;
 
+import br.com.conectaPro.model.demand.Demand;
+import br.com.conectaPro.model.user.AddressUser;
+import br.com.conectaPro.model.user.User;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -41,7 +38,7 @@ public class DemandRequest {
     private AddressUser addressId;
 
     @NotNull()
-    private Category categoryId;
+    private Long categoryId;
 
     @NotNull()
     private User clientId;
@@ -57,7 +54,6 @@ public class DemandRequest {
                 .description(description)
                 .imgUrl(imgUrl)
                 .addressId(addressId)
-                .categoryId(categoryId)
                 .clientId(clientId)
                 .professionalId(professionalId)
                 .build();

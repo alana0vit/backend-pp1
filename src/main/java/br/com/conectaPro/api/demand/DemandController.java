@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import br.com.conectaPro.model.category.CategoryService;
+import br.com.conectaPro.model.category.Category;
 import br.com.conectaPro.model.demand.Demand;
 import br.com.conectaPro.model.demand.DemandService;
 import jakarta.validation.Valid;
@@ -26,10 +28,16 @@ public class DemandController {
     @Autowired
     private DemandService demandService;
 
+    @Autowired
+    private CategoryService categoryService;
+
     @PostMapping
     public ResponseEntity<Demand> save(@RequestBody @Valid DemandRequest request) {
 
-        Demand demand = demandService.save(request.build());
+        Demand demandNew = request.build();
+        Category category = categoryService.getById(request.getCategoryId());
+        demandNew.setCategoryId(category);
+        Demand demand = demandService.save(demandNew);
         return new ResponseEntity<Demand>(demand, HttpStatus.CREATED);
     }
 
@@ -46,7 +54,9 @@ public class DemandController {
     @PutMapping("/{id}")
     public ResponseEntity<Demand> update(@PathVariable("id") Long id, @RequestBody DemandRequest request) {
 
-        demandService.update(id, request.build());
+        Demand demand = request.build();
+        demand.setCategoryId(categoryService.getById(request.getCategoryId()));
+        demandService.update(id, demand);
         return ResponseEntity.ok().build();
 
     }

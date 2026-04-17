@@ -8,6 +8,7 @@ import br.com.conectaPro.model.user.User;
 import br.com.conectaPro.util.entity.AudibleEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,7 +41,7 @@ public class Demand extends AudibleEntity{
     @Column
     private AddressUser addressId;
 
-    @Column
+    @ManyToOne
     private Category categoryId;
 
     @Column
