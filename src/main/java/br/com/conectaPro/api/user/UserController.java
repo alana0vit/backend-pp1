@@ -1,5 +1,7 @@
 package br.com.conectaPro.api.user;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,8 +14,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 import br.com.conectaPro.model.user.AddressUser;
 import br.com.conectaPro.model.user.User;
@@ -31,7 +31,7 @@ public class UserController {
     public ResponseEntity<User> save(@RequestBody @Valid UserRequest request) {
 
         User user = userService.save(request.build());
-        return new ResponseEntity<User>(user, HttpStatus.CREATED);
+        return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -66,7 +66,7 @@ public class UserController {
             @RequestBody @Valid AddressUserRequest request) {
 
         AddressUser address = userService.postAddressUser(userId, request.build());
-        return new ResponseEntity<AddressUser>(address, HttpStatus.CREATED);
+        return new ResponseEntity<>(address, HttpStatus.CREATED);
     }
 
     @PutMapping("/address/{addressId}")
@@ -74,7 +74,7 @@ public class UserController {
             @RequestBody AddressUserRequest request) {
 
         AddressUser address = userService.updateAddressUser(addressId, request.build());
-        return new ResponseEntity<AddressUser>(address, HttpStatus.OK);
+        return new ResponseEntity<>(address, HttpStatus.OK);
     }
 
     @DeleteMapping("/address/{addressId}")

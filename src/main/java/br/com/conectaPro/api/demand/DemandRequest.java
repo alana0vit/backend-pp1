@@ -4,8 +4,7 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.URL;
 
 import br.com.conectaPro.model.demand.Demand;
-import br.com.conectaPro.model.user.AddressUser;
-import br.com.conectaPro.model.user.User;
+import br.com.conectaPro.model.demand.DemandStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -35,13 +34,16 @@ public class DemandRequest {
     private String imgUrl;
 
     @NotNull()
-    private AddressUser addressId;
+    private Long addressId;
 
     @NotNull()
     private Long categoryId;
 
     @NotNull()
     private Long clientId;
+
+    @NotBlank()
+    private DemandStatus demandStatus;
 
     @NotNull
     private Long professionalId;
@@ -53,9 +55,7 @@ public class DemandRequest {
                 .title(title)
                 .description(description)
                 .imgUrl(imgUrl)
-                .addressId(addressId)
-                .clientId(clientId)
-                .professionalId(professionalId)
+                .demandStatus(demandStatus)
                 .build();
     }
 }
