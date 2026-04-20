@@ -39,15 +39,15 @@ public class Demand extends AudibleEntity{
     private String imgUrl;
 
     @Column
-    private AddressUser addressId;
+    private Long addressId;
 
     @ManyToOne
     private Category categoryId;
 
     @Column
-    private User clientId;
+    private Long clientId;
 
     @Column
-    private User professionalId;
+    private Long professionalId;
     
 }
