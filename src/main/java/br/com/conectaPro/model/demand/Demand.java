@@ -45,6 +45,9 @@ public class Demand extends AudibleEntity{
     private Category categoryId;
 
     @Column
+    private DemandStatus demandStatus;
+
+    @Column
     private User clientId;
 
     @Column
