@@ -42,7 +42,7 @@ public class Demand extends AudibleEntity{
     private Long addressId;
 
     @ManyToOne
-    private Category categoryId;
+    private Long categoryId;
 
     @Column
     private Long clientId;
