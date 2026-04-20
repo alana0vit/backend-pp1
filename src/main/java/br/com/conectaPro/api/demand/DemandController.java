@@ -46,6 +46,17 @@ public class DemandController {
         return demandService.getAll();
     }
 
+
+    /** TODO
+     * Separação das Demandas por Usuário
+     * Atualmente, o DemandController tem um GET /api/demand que traz 
+     * todos os pedidos do mundo. 
+     * Isso vaza dados de outros clientes.
+     * Como resolver? 
+     * Criar endpoints específicos para listagem.
+     * Um GET /api/demand/client/{id} 
+     * OutroGET /api/demand/professional/{id} 
+    */ 
     @GetMapping("/{id}")
     public Demand getById(@PathVariable Long id) {
         return demandService.getById(id);
