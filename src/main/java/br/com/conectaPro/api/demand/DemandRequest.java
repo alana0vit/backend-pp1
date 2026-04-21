@@ -42,7 +42,7 @@ public class DemandRequest {
     @NotNull()
     private Long clientId;
 
-    @NotBlank()
+    @NotNull()
     private DemandStatus demandStatus;
 
     @NotNull

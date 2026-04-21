@@ -34,6 +34,9 @@ public class DemandController {
     @Autowired
     private UserService addressService;
 
+    @Autowired
+    private UserService userService;
+
     @PostMapping
     public ResponseEntity<Demand> save(@RequestBody @Valid DemandRequest request) {
 
@@ -41,6 +44,8 @@ public class DemandController {
 
         demandNew.setCategoryId(categoryService.getById(request.getCategoryId()));
         demandNew.setAddressId(addressService.getAddressById(request.getAddressId()));
+        demandNew.setClientId(userService.getById(request.getClientId()));
+        demandNew.setProfessionalId(userService.getById(request.getProfessionalId()));
 
         Demand demand = demandService.save(demandNew);
         return new ResponseEntity<>(demand, HttpStatus.CREATED);

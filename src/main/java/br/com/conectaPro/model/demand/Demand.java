@@ -8,6 +8,8 @@ import br.com.conectaPro.model.user.User;
 import br.com.conectaPro.util.entity.AudibleEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -24,7 +26,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Demand extends AudibleEntity{
+public class Demand extends AudibleEntity {
 
     @Column(unique = true)
     private String code;
@@ -44,13 +46,13 @@ public class Demand extends AudibleEntity{
     @ManyToOne
     private Category categoryId;
 
-    @Column
+    @ManyToOne
     private User clientId;
-  
-    @Column
+
+    @ManyToOne
+    private User professionalId;
+
+    @Enumerated(EnumType.STRING)
     private DemandStatus demandStatus;
 
-    @Column
-    private User professionalId;
-    
 }

@@ -5,6 +5,9 @@ import java.util.List;
 
 import org.hibernate.annotations.SQLRestriction;
 
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+
 import br.com.conectaPro.util.entity.AudibleEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -42,13 +45,13 @@ public class User extends AudibleEntity {
     @Column
     private String phone;
 
-    @Column
+    @Enumerated(EnumType.STRING)
     private UserType userType;
 
     @Column
     private String registryId;
 
-    @OneToMany(mappedBy="userId", orphanRemoval=true, fetch=FetchType.EAGER)
+    @OneToMany(mappedBy = "userId", orphanRemoval = true, fetch = FetchType.EAGER)
     private List<AddressUser> addressId;
 
 }
