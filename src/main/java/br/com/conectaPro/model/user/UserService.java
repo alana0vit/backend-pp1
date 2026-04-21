@@ -5,40 +5,65 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import br.com.conectaPro.model.category.Category;
+import br.com.conectaPro.model.category.CategoryRepository;
+import br.com.conectaPro.model.user.UserType;
 import jakarta.transaction.Transactional;
 
 @Service
 public class UserService {
 
-    private final UserRepository repository;
+    private final UserRepository userRepository;
     private final AddressUserRepository addressUserRepository;
+    private final CategoryRepository categoryRepository;
 
-    public UserService(UserRepository repository, AddressUserRepository addressUserRepository) {
-        this.repository = repository;
+    public UserService(UserRepository repository, AddressUserRepository addressUserRepository,
+            CategoryRepository categoryRepository) {
+        this.userRepository = repository;
         this.addressUserRepository = addressUserRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @Transactional
-    public User save(User user) {
+    public User save(User user, List<Long> categoryIds) {
+        validateProfessionalCategories(user.getUserType(), categoryIds);
+
+        if (categoryIds != null && !categoryIds.isEmpty()) {
+            List<Category> categories = categoryRepository.findAllById(categoryIds);
+            user.setCategories(categories);
+        }
 
         user.setEnabled(Boolean.TRUE);
-        return repository.save(user);
+        return userRepository.save(user);
+    }
+
+    private void validateProfessionalCategories(UserType userType, List<Long> categoryIds) {
+        if (UserType.CLIENT.equals(userType) && categoryIds != null && !categoryIds.isEmpty()) {
+            // Vou jogar uma exceção aqui, talvez precise reformuçar a maneira de lidar com
+            // erros
+            // Pode ser pega pelo controller e soltar um 400 (Bad Request)
+            throw new IllegalArgumentException(
+                    "Erro de negócio: Clientes não podem possuir categorias profissionais vinculadas.");
+        }
     }
 
     public List<User> getAll() {
 
-        return repository.findAll();
+        return userRepository.findAll();
     }
 
     public User getById(Long id) {
 
-        return repository.findById(id).get();
+        return userRepository.findById(id).get();
     }
 
     @Transactional
-    public void update(Long id, User userChanged) {
+    public void update(Long id, User userChanged, List<Long> categoryIds) {
 
-        User user = repository.findById(id).get();
+        User user = userRepository.findById(id).get(); // Talvez add um orElseThrow()
+
+        validateProfessionalCategories(userChanged.getUserType(), categoryIds);
+
         user.setName(userChanged.getName());
         user.setEmail(userChanged.getEmail());
         user.setPassword(userChanged.getPassword());
@@ -46,24 +71,32 @@ public class UserService {
         user.setPhone(userChanged.getPhone());
         user.setUserType(userChanged.getUserType());
         user.setRegistryId(userChanged.getRegistryId());
-        user.setAddressId(userChanged.getAddressId());
-        repository.save(user);
+        user.setAdresses(userChanged.getAdresses());
+
+        if (categoryIds != null) {
+            List<Category> categories = categoryRepository.findAllById(categoryIds);
+            user.setCategories(categories);
+        } else {
+            user.setCategories(new ArrayList<>());
+        }
+
+        userRepository.save(user);
     }
 
     @Transactional
     public void delete(Long id) {
 
-        User user = repository.findById(id).get();
+        User user = userRepository.findById(id).get();
         user.setEnabled(Boolean.FALSE);
 
-        repository.save(user);
+        userRepository.save(user);
     }
 
     // Endereços
 
     public List<AddressUser> getAllAddressByUser(Long userId) {
         User user = this.getById(userId);
-        return user.getAddressId();
+        return user.getAdresses();
     }
 
     public AddressUser getAddressById(Long id) {
@@ -80,15 +113,15 @@ public class UserService {
         address.setEnabled(Boolean.TRUE);
         addressUserRepository.save(address);
 
-        List<AddressUser> listAddressUser = user.getAddressId();
+        List<AddressUser> listAddressUser = user.getAdresses();
 
         if (listAddressUser == null) {
             listAddressUser = new ArrayList<>();
         }
 
         listAddressUser.add(address);
-        user.setAddressId(listAddressUser);
-        repository.save(user);
+        user.setAdresses(listAddressUser);
+        userRepository.save(user);
 
         return address;
     }
@@ -118,8 +151,8 @@ public class UserService {
         addressUserRepository.save(address);
 
         User user = this.getById(address.getUserId().getId());
-        user.getAddressId().remove(address);
-        repository.save(user);
+        user.getAdresses().remove(address);
+        userRepository.save(user);
     }
 
 }

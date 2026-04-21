@@ -29,8 +29,8 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<User> save(@RequestBody @Valid UserRequest request) {
-
-        User user = userService.save(request.build());
+        // Passando a lista de categorias e a entidade separados
+        User user = userService.save(request.build(), request.getCategoriesIds());
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
@@ -47,7 +47,7 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<User> update(@PathVariable("id") Long id, @RequestBody UserRequest request) {
 
-        userService.update(id, request.build());
+        userService.update(id, request.build(), request.getCategoriesIds());
         return ResponseEntity.ok().build();
 
     }
