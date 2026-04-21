@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import br.com.conectaPro.model.user.AddressUser;
 import br.com.conectaPro.model.user.User;
 import br.com.conectaPro.model.user.UserType;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -52,7 +51,11 @@ public class UserRequest {
     @NotBlank()
     private String registryId;
 
-    private List<AddressUser> addressId;
+    private List<AddressUser> adresses;
+
+    // Não mapeamos as categorias aqui, pois precisamos do banco para isso
+    // Faremos isso no service
+    private List<Long> categoriesIds; 
 
     public User build() {
 
@@ -64,7 +67,7 @@ public class UserRequest {
                 .phone(phone)
                 .userType(userType)
                 .registryId(registryId)
-                .addressId(addressId)
+                .adresses(adresses)
                 .build();
     }
 
