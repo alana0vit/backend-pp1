@@ -3,7 +3,6 @@ package br.com.conectaPro.model.user;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
@@ -11,11 +10,11 @@ import jakarta.transaction.Transactional;
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository repository;
+    private final UserRepository repository;
     private final AddressUserRepository addressUserRepository;
 
-    UserService(AddressUserRepository addressUserRepository) {
+    public UserService(UserRepository repository, AddressUserRepository addressUserRepository) {
+        this.repository = repository;
         this.addressUserRepository = addressUserRepository;
     }
 
@@ -62,6 +61,16 @@ public class UserService {
 
     // Endereços
 
+    public List<AddressUser> getAllAddressByUser(Long userId) {
+        User user = this.getById(userId);
+        return user.getAddressId();
+    }
+
+    public AddressUser getAddressById(Long id) {
+        return addressUserRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Endereço não encontrado"));
+    }
+
     @Transactional
     public AddressUser postAddressUser(Long userId, AddressUser address) {
 
@@ -74,7 +83,7 @@ public class UserService {
         List<AddressUser> listAddressUser = user.getAddressId();
 
         if (listAddressUser == null) {
-            listAddressUser = new ArrayList<AddressUser>();
+            listAddressUser = new ArrayList<>();
         }
 
         listAddressUser.add(address);

@@ -38,7 +38,7 @@ public class Demand extends AudibleEntity{
     @Column
     private String imgUrl;
 
-    @Column
+    @ManyToOne
     private AddressUser addressId;
 
     @ManyToOne

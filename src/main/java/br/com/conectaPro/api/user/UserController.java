@@ -61,7 +61,17 @@ public class UserController {
 
     // Endereços
 
-    @PostMapping("/address/{userId}")
+    @GetMapping("/{userId}/addresses")
+    public List<AddressUser> getAllAddresses(@PathVariable Long userId) {
+        return userService.getAllAddressByUser(userId);
+    }
+
+    @GetMapping("/addresses/{addressId}")
+    public AddressUser getAddressById(@PathVariable Long addressId) {
+        return userService.getAddressById(addressId);
+    }
+
+    @PostMapping("/{userId}/addresses")
     public ResponseEntity<AddressUser> postAddressUser(@PathVariable("userId") Long userId,
             @RequestBody @Valid AddressUserRequest request) {
 

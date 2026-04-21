@@ -1,11 +1,11 @@
 package br.com.conectaPro.model.demand;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
-
-import java.util.List;
 
 @Service
 public class DemandService {
@@ -40,6 +40,7 @@ public class DemandService {
         demand.setAddressId(demandChanged.getAddressId());
         demand.setCategoryId(demandChanged.getCategoryId());
         demand.setClientId(demandChanged.getClientId());
+        demand.setDemandStatus(demandChanged.getDemandStatus());
         demand.setProfessionalId(demandChanged.getProfessionalId());
 
         repository.save(demand);
