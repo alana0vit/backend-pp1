@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.conectaPro.model.user.AddressUser;
@@ -57,6 +58,18 @@ public class UserController {
 
         userService.delete(id);
         return ResponseEntity.ok().build();
+    }
+
+    // Filtros de busca para user do tipo "PROFESSIONAL"
+
+    @GetMapping("/search")
+    public List<User> search(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) Double latitude,
+            @RequestParam(required = false) Double longitude,
+            @RequestParam(required = false) Double radiusKm) {
+        return userService.search(name, categoryId, latitude, longitude, radiusKm);
     }
 
     // Endereços

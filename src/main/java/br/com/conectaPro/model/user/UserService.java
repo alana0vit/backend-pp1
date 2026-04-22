@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import br.com.conectaPro.model.category.Category;
 import br.com.conectaPro.model.category.CategoryRepository;
-import br.com.conectaPro.model.user.UserType;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -90,6 +89,18 @@ public class UserService {
         user.setEnabled(Boolean.FALSE);
 
         userRepository.save(user);
+    }
+
+    // Filtros de busca para user do tipo "PROFESSIONAL"
+
+    public List<User> search(String name, Long categoryId,
+            Double lat, Double lng, Double radiusKm) {
+
+        if (radiusKm != null && radiusKm > 20) {
+            throw new IllegalArgumentException("Distância máxima permitida alcançada");
+        }
+
+        return userRepository.searchUsers(name, categoryId, lat, lng, radiusKm);
     }
 
     // Endereços
