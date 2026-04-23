@@ -36,15 +36,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String userEmail;
+        
+        // Localiza onde você verifica o authHeader
+        final String authHeader = request.getHeader("Authorization");
 
-        // Verificar se o cabeçalho Authorization existe e começa com "Bearer "
-        // Sim, com um espaço depois de Bearer
-        if (authHeader != null || !authHeader.startsWith("Bearer ")) {
+        // Se for nulo ou não começar com Bearer, apenas passe para o próximo filtro
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
-            return;
+            return; // O return é CRUCIAL aqui para parar a execução deste filtro
         }
 
         // Extrai o token jwt
