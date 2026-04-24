@@ -30,15 +30,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        // Pular o filtro para as rotas de autenticação para evitar loops
-        if (request.getServletPath().contains("/auth")) {
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            response.setStatus(HttpServletResponse.SC_OK);
+        } else if (request.getServletPath().contains("/auth")) { // Pular o filtro para as rotas de autenticação para
+                                                                 // evitar loops
             filterChain.doFilter(request, response);
             return;
         }
 
         final String jwt;
         final String userEmail;
-        
+
         // Localiza onde você verifica o authHeader
         final String authHeader = request.getHeader("Authorization");
 
