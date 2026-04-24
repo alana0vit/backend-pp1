@@ -48,7 +48,7 @@ public class UserService {
         List<AddressUser> addresses = new ArrayList<>();
         addresses.add(addressUser);
         savedUser.setAdresses(addresses);
-        
+
         return savedUser;
     }
 
@@ -86,12 +86,21 @@ public class UserService {
 
         user.setName(userChanged.getName());
         user.setEmail(userChanged.getEmail());
-        user.setPassword(userChanged.getPassword());
         user.setBirthDate(userChanged.getBirthDate());
         user.setPhone(userChanged.getPhone());
         user.setUserType(userChanged.getUserType());
         user.setRegistryId(userChanged.getRegistryId());
-        user.setAdresses(userChanged.getAdresses());
+
+        if (userChanged.getPassword() != null && userChanged.getPassword().isBlank()) {
+            user.setPassword(userChanged.getPassword());
+        }
+
+        if (userChanged.getAdresses() != null) {
+            user.getAdresses().clear();
+            // Garante a integridade da Foreign Key (Essencial!)
+            userChanged.getAdresses().forEach(address -> address.setUserId(user));
+            user.getAdresses().addAll(userChanged.getAdresses());
+        }
 
         if (categoryIds != null) {
             List<Category> categories = categoryRepository.findAllById(categoryIds);
