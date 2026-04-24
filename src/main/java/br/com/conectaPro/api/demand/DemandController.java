@@ -91,16 +91,12 @@ public class DemandController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Demand> update(@PathVariable("id") @NonNull Long id, @RequestBody DemandRequest request) {
+
         Demand demand = request.build();
-        
-        // Agora sim, reconstruímos todas as relações antes de mandar para o Service!
         demand.setCategoryId(categoryService.getById(request.getCategoryId()));
-        demand.setAddressId(userService.getAddressById(request.getAddressId()));
-        demand.setClientId(userService.getById(request.getClientId()));
-        demand.setProfessionalId(userService.getById(request.getProfessionalId()));
-        
         demandService.update(id, demand);
         return ResponseEntity.ok().build();
+
     }
 
     @PatchMapping("/{id}/reassign")
