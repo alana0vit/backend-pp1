@@ -48,7 +48,7 @@ public class UserService {
         List<AddressUser> addresses = new ArrayList<>();
         addresses.add(addressUser);
         savedUser.setAdresses(addresses);
-        
+
         return savedUser;
     }
 
@@ -91,7 +91,18 @@ public class UserService {
         user.setPhone(userChanged.getPhone());
         user.setUserType(userChanged.getUserType());
         user.setRegistryId(userChanged.getRegistryId());
-        user.setAdresses(userChanged.getAdresses());
+
+        if (userChanged.getAdresses() != null || userChanged.getAdresses().isEmpty()) {
+            throw new IllegalArgumentException("O usuário não pode ficar sem um endereço"); // Mudar um possível
+                                                                                            // Buisiness Exception!
+        }
+
+        user.getAdresses().clear();
+
+        // Garante a integridade da Foreign Key (Essencial!)
+        userChanged.getAdresses().forEach(address -> address.setUserId(user));
+
+        user.getAdresses().addAll(userChanged.getAdresses());
 
         if (categoryIds != null) {
             List<Category> categories = categoryRepository.findAllById(categoryIds);
