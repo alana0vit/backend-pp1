@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.conectaPro.dto.UserResponseDTO;
 import br.com.conectaPro.model.user.AddressUser;
 import br.com.conectaPro.model.user.User;
 import br.com.conectaPro.model.user.UserService;
@@ -41,8 +42,9 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User getById(@PathVariable Long id) {
-        return userService.getById(id);
+    public ResponseEntity<UserResponseDTO> getById(@PathVariable Long id) {
+        User user = userService.getById(id);
+        return ResponseEntity.ok(UserResponseDTO.fromEntity(user));
     }
 
     @PutMapping("/{id}")
@@ -63,13 +65,17 @@ public class UserController {
     // Filtros de busca para user do tipo "PROFESSIONAL"
 
     @GetMapping("/search")
-    public List<User> search(
+    public ResponseEntity<List<UserResponseDTO>> search(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) Double latitude,
             @RequestParam(required = false) Double longitude,
             @RequestParam(required = false) Double radiusKm) {
-        return userService.search(name, categoryId, latitude, longitude, radiusKm);
+        List<User> users = userService.search(name, categoryId, latitude, longitude, radiusKm);
+        List<UserResponseDTO> response = users.stream()
+                .map(UserResponseDTO::fromEntity)
+                .toList();
+        return ResponseEntity.ok(response);
     }
 
     // Endereços
