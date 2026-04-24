@@ -31,7 +31,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<User> save(@RequestBody @Valid UserRequest request) {
         // Passando a lista de categorias e a entidade separados
-        User user = userService.save(request.build(), request.getCategoriesIds());
+        User user = userService.save(request);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
