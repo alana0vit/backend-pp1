@@ -2,6 +2,7 @@ package br.com.conectaPro.api.demand;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ import br.com.conectaPro.model.category.Category;
 import br.com.conectaPro.model.category.CategoryService;
 import br.com.conectaPro.model.demand.Demand;
 import br.com.conectaPro.model.demand.DemandService;
+import br.com.conectaPro.model.demand.DemandStatus;
 import br.com.conectaPro.model.user.AddressUser;
 import br.com.conectaPro.model.user.User;
 import br.com.conectaPro.model.user.UserService;
@@ -59,6 +61,9 @@ public class DemandController {
             demandNew.setAddressId(address);
             demandNew.setClientId(client);
             demandNew.setProfessionalId(professional);
+            demandNew.setDemandStatus(DemandStatus.OPENED);
+            String demandCode = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+            demandNew.setCode(demandCode);
 
             Demand demand = demandService.save(demandNew);
             return new ResponseEntity<>(demand, HttpStatus.CREATED);

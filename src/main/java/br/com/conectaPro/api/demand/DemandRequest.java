@@ -18,8 +18,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DemandRequest {
 
-    @NotBlank
-    @Length(max=50)
+    @Length(max = 50)
     private String code;
 
     @NotBlank()
@@ -42,7 +41,6 @@ public class DemandRequest {
     @NotNull()
     private Long clientId;
 
-    @NotNull()
     private DemandStatus demandStatus;
 
     @NotNull
