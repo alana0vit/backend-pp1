@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import br.com.conectaPro.api.user.UserRequest;
 import br.com.conectaPro.model.category.Category;
 import br.com.conectaPro.model.category.CategoryRepository;
 import jakarta.transaction.Transactional;
@@ -24,16 +25,29 @@ public class UserService {
     }
 
     @Transactional
-    public User save(User user, List<Long> categoryIds) {
-        validateProfessionalCategories(user.getUserType(), categoryIds);
+    public User save(UserRequest userRequest) {
+        validateProfessionalCategories(userRequest.getUserType(), userRequest.getCategoriesIds());
 
-        if (categoryIds != null && !categoryIds.isEmpty()) {
-            List<Category> categories = categoryRepository.findAllById(categoryIds);
+        // Instancia e salva o User
+        User user = userRequest.build();
+        if (userRequest.getCategoriesIds() != null && !userRequest.getCategoriesIds().isEmpty()) {
+            List<Category> categories = categoryRepository.findAllById(userRequest.getCategoriesIds());
             user.setCategories(categories);
         }
 
         user.setEnabled(Boolean.TRUE);
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        // Instancia e salva o Address vinculado ao User
+        AddressUser addressUser = userRequest.getAddress().build();
+        addressUser.setUserId(savedUser);
+        addressUser.setEnabled(Boolean.TRUE);
+        addressUserRepository.save(addressUser);
+
+        // Atualiza a lista no objeto (para retornos imediatos, se necessário)
+        savedUser.setAdresses(List.of(addressUser));
+
+        return savedUser;
     }
 
     private void validateProfessionalCategories(UserType userType, List<Long> categoryIds) {

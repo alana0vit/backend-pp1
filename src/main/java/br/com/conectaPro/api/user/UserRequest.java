@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import br.com.conectaPro.model.user.AddressUser;
 import br.com.conectaPro.model.user.User;
 import br.com.conectaPro.model.user.UserType;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -51,7 +52,9 @@ public class UserRequest {
     @NotBlank()
     private String registryId;
 
-    private List<AddressUser> adresses;
+    @NotNull(message = "O endereço é obrigatório")
+    @Valid // Para garantir que as validações do AddressUserRequest sejam executadas
+    private AddressUserRequest address;
 
     // Não mapeamos as categorias aqui, pois precisamos do banco para isso
     // Faremos isso no service
@@ -67,7 +70,8 @@ public class UserRequest {
                 .phone(phone)
                 .userType(userType)
                 .registryId(registryId)
-                .adresses(adresses)
+                // Não mapeamos o endereço aqui, faremos no Service
+                // .adresses(adresses)
                 .build();
     }
 
