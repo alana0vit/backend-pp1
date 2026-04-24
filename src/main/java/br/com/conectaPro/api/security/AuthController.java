@@ -30,8 +30,10 @@ public class AuthController {
             User user = userOpt.get();
 
             // 2. Checa se a senha enviada bate com o hash do banco
-            if (passwordEncoder.matches(request.password(), user.getPassword())) {
-
+            // if (passwordEncoder.matches(request.password(), user.getPassword())) { //
+            // Comentado para não usar o pwd encoder
+            boolean senhaValida = request.password().equals(user.getPassword());
+            if (senhaValida) {
                 // Login bem sucedido - Retornamos os dados sem o Token
                 return ResponseEntity.ok(new LoginResponseDTO(
                         "sou um token", // Token enviado como genérico

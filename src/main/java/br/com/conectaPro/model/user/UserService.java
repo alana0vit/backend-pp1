@@ -45,8 +45,10 @@ public class UserService {
         addressUserRepository.save(addressUser);
 
         // Atualiza a lista no objeto (para retornos imediatos, se necessário)
-        savedUser.setAdresses(List.of(addressUser));
-
+        List<AddressUser> addresses = new ArrayList<>();
+        addresses.add(addressUser);
+        savedUser.setAdresses(addresses);
+        
         return savedUser;
     }
 
@@ -58,6 +60,11 @@ public class UserService {
             throw new IllegalArgumentException(
                     "Erro de negócio: Clientes não podem possuir categorias profissionais vinculadas.");
         }
+    }
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado com o email: " + email));
     }
 
     public List<User> getAll() {
