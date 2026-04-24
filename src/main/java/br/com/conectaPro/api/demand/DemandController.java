@@ -7,9 +7,11 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.conectaPro.dto.ReassignRequestDTO;
 import br.com.conectaPro.model.category.Category;
 import br.com.conectaPro.model.category.CategoryService;
 import br.com.conectaPro.model.demand.Demand;
@@ -82,12 +85,12 @@ public class DemandController {
     }
 
     @GetMapping("/user/{id}")
-    public Demand getById(@PathVariable Long id) {
+    public Demand getById(@PathVariable @NonNull Long id) {
         return demandService.getById(id);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Demand> update(@PathVariable("id") Long id, @RequestBody DemandRequest request) {
+    public ResponseEntity<Demand> update(@PathVariable("id") @NonNull Long id, @RequestBody DemandRequest request) {
 
         Demand demand = request.build();
         demand.setCategoryId(categoryService.getById(request.getCategoryId()));
@@ -96,8 +99,18 @@ public class DemandController {
 
     }
 
+    @PatchMapping("/{id}/reassign")
+    public ResponseEntity<Demand> reassignProfessional(
+        @PathVariable @NonNull Long id,
+        @RequestBody ReassignRequestDTO request
+    ) {
+        Demand updatedDemand = demandService.reassign(id, request.professionalId());
+        return ResponseEntity.ok(updatedDemand);
+        
+    }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable @NonNull Long id) {
 
         demandService.delete(id);
         return ResponseEntity.ok().build();
