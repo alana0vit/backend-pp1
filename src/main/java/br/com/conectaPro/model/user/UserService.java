@@ -86,23 +86,21 @@ public class UserService {
 
         user.setName(userChanged.getName());
         user.setEmail(userChanged.getEmail());
-        user.setPassword(userChanged.getPassword());
         user.setBirthDate(userChanged.getBirthDate());
         user.setPhone(userChanged.getPhone());
         user.setUserType(userChanged.getUserType());
         user.setRegistryId(userChanged.getRegistryId());
 
-        if (userChanged.getAdresses() != null || userChanged.getAdresses().isEmpty()) {
-            throw new IllegalArgumentException("O usuário não pode ficar sem um endereço"); // Mudar um possível
-                                                                                            // Buisiness Exception!
+        if (userChanged.getPassword() != null && userChanged.getPassword().isBlank()) {
+            user.setPassword(userChanged.getPassword());
         }
 
-        user.getAdresses().clear();
-
-        // Garante a integridade da Foreign Key (Essencial!)
-        userChanged.getAdresses().forEach(address -> address.setUserId(user));
-
-        user.getAdresses().addAll(userChanged.getAdresses());
+        if (userChanged.getAdresses() != null) {
+            user.getAdresses().clear();
+            // Garante a integridade da Foreign Key (Essencial!)
+            userChanged.getAdresses().forEach(address -> address.setUserId(user));
+            user.getAdresses().addAll(userChanged.getAdresses());
+        }
 
         if (categoryIds != null) {
             List<Category> categories = categoryRepository.findAllById(categoryIds);
