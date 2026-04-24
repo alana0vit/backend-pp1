@@ -34,7 +34,7 @@ public class AuthController {
 
                 // Login bem sucedido - Retornamos os dados sem o Token
                 return ResponseEntity.ok(new LoginResponseDTO(
-                        null, // Token enviado como null ou remova do DTO
+                        "sou um token", // Token enviado como genérico
                         user.getId(),
                         user.getName(),
                         user.getUserType()));
