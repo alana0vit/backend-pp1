@@ -9,9 +9,22 @@ import org.springframework.data.jpa.repository.Query;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
 
+    /**
+     * (Débito Técnico para o futuro pra Alana e JP)
+     * não colocar o sufixo "Id" em atributos que representam a entidade inteira.
+     * clientId, addressId, professionalId na entidade Demand), o padrão correto
+     * seria:
+     * 
+     * /@ManyToOne
+     * /@JoinColumn(name = "user_id") // Forçamos o nome da coluna no
+     * banco
+     * private User user; // O atributo representa o Objeto, não o ID
+     * No momento fiz a edição na mão, corrigi o user_id e pus user_id_id
+     */
+
     @Query(value = """
             SELECT u.* FROM Users u
-            JOIN Address a ON a.user_id = u.id
+            JOIN Address a ON a.user_id_id = u.id
             LEFT JOIN user_category uc ON uc.user_id = u.id
             WHERE u.enabled = true
             AND u.user_type = 'PROFESSIONAL'
