@@ -1,6 +1,7 @@
 package br.com.conectaPro.api.demand;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,9 +16,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.conectaPro.model.category.Category;
 import br.com.conectaPro.model.category.CategoryService;
 import br.com.conectaPro.model.demand.Demand;
 import br.com.conectaPro.model.demand.DemandService;
+import br.com.conectaPro.model.user.AddressUser;
+import br.com.conectaPro.model.user.User;
 import br.com.conectaPro.model.user.UserService;
 import jakarta.validation.Valid;
 
@@ -38,17 +42,33 @@ public class DemandController {
     private UserService userService;
 
     @PostMapping
-    public ResponseEntity<Demand> save(@RequestBody @Valid DemandRequest request) {
+    public ResponseEntity<?> save(@RequestBody @Valid DemandRequest request) {
 
-        Demand demandNew = request.build();
+        // TODO: Futuramente, mover essas validações para um @RestControllerAdvice
+        // usando exceptions customizadas (ex: EntityNotFoundException).
 
-        demandNew.setCategoryId(categoryService.getById(request.getCategoryId()));
-        demandNew.setAddressId(addressService.getAddressById(request.getAddressId()));
-        demandNew.setClientId(userService.getById(request.getClientId()));
-        demandNew.setProfessionalId(userService.getById(request.getProfessionalId()));
+        try {
+            // As buscas com validação. Se não existir, caem no catch e retornamos 404.
+            User client = userService.getById(request.getClientId());
+            User professional = userService.getById(request.getProfessionalId());
+            Category category = categoryService.getById(request.getCategoryId());
+            AddressUser address = userService.getAddressById(request.getAddressId());
 
-        Demand demand = demandService.save(demandNew);
-        return new ResponseEntity<>(demand, HttpStatus.CREATED);
+            Demand demandNew = request.build();
+            demandNew.setCategoryId(category);
+            demandNew.setAddressId(address);
+            demandNew.setClientId(client);
+            demandNew.setProfessionalId(professional);
+
+            Demand demand = demandService.save(demandNew);
+            return new ResponseEntity<>(demand, HttpStatus.CREATED);
+
+        } catch (NoSuchElementException e) {
+            // Captura o erro do .get() dos services e devolve 400 Bad Request ou 404 Not
+            // Found
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Um dos IDs informados (Cliente, Profissional, Categoria ou Endereço) não existe.");
+        }
     }
 
     @GetMapping("/user")
@@ -77,5 +97,5 @@ public class DemandController {
         demandService.delete(id);
         return ResponseEntity.ok().build();
     }
-    
+
 }
