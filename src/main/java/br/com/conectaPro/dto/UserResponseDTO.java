@@ -1,11 +1,11 @@
 package br.com.conectaPro.dto;
 
-import br.com.conectaPro.model.user.User;
-import br.com.conectaPro.model.user.UserType;
-import br.com.conectaPro.model.category.Category;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import br.com.conectaPro.model.user.User;
+import br.com.conectaPro.model.user.UserType;
 
 public record UserResponseDTO(
         Long id,

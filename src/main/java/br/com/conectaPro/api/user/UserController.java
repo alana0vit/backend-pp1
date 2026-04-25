@@ -112,5 +112,4 @@ public class UserController {
         userService.deleteAddressUser(addressId);
         return ResponseEntity.noContent().build();
     }
-
 }
