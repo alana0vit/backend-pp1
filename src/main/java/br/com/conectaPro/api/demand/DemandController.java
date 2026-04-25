@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+import br.com.conectaPro.dto.StatusUpdateDTO;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -101,12 +103,19 @@ public class DemandController {
 
     @PatchMapping("/{id}/reassign")
     public ResponseEntity<Demand> reassignProfessional(
-        @PathVariable @NonNull Long id,
-        @RequestBody ReassignRequestDTO request
-    ) {
+            @PathVariable @NonNull Long id,
+            @RequestBody ReassignRequestDTO request) {
         Demand updatedDemand = demandService.reassign(id, request.professionalId());
         return ResponseEntity.ok(updatedDemand);
-        
+
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Demand> updateStatus(
+            @PathVariable Long id,
+            @RequestBody StatusUpdateDTO request) {
+        Demand updated = demandService.updateStatus(id, request.getStatus());
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")

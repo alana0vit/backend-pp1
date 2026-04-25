@@ -82,6 +82,16 @@ public class DemandService {
   }
 
   @Transactional
+public Demand updateStatus(Long id, DemandStatus status) {
+    Demand demand = repository.findById(id)
+        .orElseThrow(() -> new NoSuchElementException());
+
+    demand.setDemandStatus(status);
+
+    return repository.save(demand);
+}
+
+  @Transactional
   public void delete(@NonNull Long id) {
 
     Demand demand = repository.findById(id).get();
