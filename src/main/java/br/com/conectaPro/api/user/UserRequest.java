@@ -59,11 +59,9 @@ public class UserRequest {
     private String registryId;
 
     @NotNull(message = "O endereço é obrigatório")
-    @Valid // Para garantir que as validações do AddressUserRequest sejam executadas
+    @Valid
     private AddressUserRequest address;
 
-    // Não mapeamos as categorias aqui, pois precisamos do banco para isso
-    // Faremos isso no service
     private List<Long> categoriesIds; 
 
     public User build() {
@@ -76,8 +74,6 @@ public class UserRequest {
                 .phone(phone)
                 .userType(userType)
                 .registryId(registryId)
-                // Não mapeamos o endereço aqui, faremos no Service
-                // .adresses(adresses)
                 .build();
     }
 
