@@ -11,6 +11,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,17 +29,17 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Rating extends AudibleEntity {
 
-    @Column()
+    @ManyToOne()
     private Demand service;
 
-    @Column(unique = true)
+    @ManyToOne()
     private User evaluatingPerson;
 
-    @Column(unique = true)
+    @ManyToOne()
     private User personEvaluated;
 
     @Column()
-    private double points;
+    private Double points;
 
     @Column(length = 500)
     private String description;
@@ -47,7 +48,7 @@ public class Rating extends AudibleEntity {
     private LocalDateTime evaluateDate;
 
     @Column()
-    private boolean anonymous;
+    private Boolean anonymous;
 
     @Enumerated(EnumType.STRING)
     private EvaluateStatus status;

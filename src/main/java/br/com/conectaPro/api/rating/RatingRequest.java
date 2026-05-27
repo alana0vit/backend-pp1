@@ -2,7 +2,6 @@ package br.com.conectaPro.api.rating;
 
 import java.time.LocalDateTime;
 
-import br.com.conectaPro.model.demand.Demand;
 import br.com.conectaPro.model.rating.EvaluateStatus;
 import br.com.conectaPro.model.rating.Rating;
 import br.com.conectaPro.model.user.User;
@@ -17,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RatingRequest {
-    private Demand service;
+    private Long service;
 
     private User evaluatingPerson;
 
@@ -36,7 +35,6 @@ public class RatingRequest {
     public Rating build() {
 
         return Rating.builder()
-                .service(service)
                 .evaluatingPerson(evaluatingPerson)
                 .personEvaluated(personEvaluated)
                 .points(points)
