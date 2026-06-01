@@ -62,7 +62,7 @@ public class DemandController {
             demandNew.setAddressId(address);
             demandNew.setClientId(client);
             demandNew.setProfessionalId(professional);
-            demandNew.setDemandStatus(DemandStatus.OPENED);
+            demandNew.setDemandStatus(DemandStatus.ABERTO);
             String demandCode = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
             demandNew.setCode(demandCode);
 

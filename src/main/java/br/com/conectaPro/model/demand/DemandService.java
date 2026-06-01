@@ -68,7 +68,7 @@ public class DemandService {
 
     // Regra de negócio: Só pode reatribuir se estiver rejeitada
     // (ou aberta, dependendo da regra que a gente deixar em vigor, blz?)
-    if (demand.getDemandStatus() != DemandStatus.REJECTED) {
+    if (demand.getDemandStatus() != DemandStatus.REJEITADO) {
       throw new IllegalStateException("Apenas demandas rejeitadas podem ser reatribuídas.");
     }
 
@@ -76,7 +76,7 @@ public class DemandService {
 
     // Agora atualiza o prof e coloca o status como OPEN de novo
     demand.setProfessionalId(newProfessional);
-    demand.setDemandStatus(DemandStatus.OPENED);
+    demand.setDemandStatus(DemandStatus.ABERTO);
 
     return repository.save(demand);
   }
