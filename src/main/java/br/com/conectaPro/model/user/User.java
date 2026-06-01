@@ -48,6 +48,9 @@ public class User extends AudibleEntity {
     @Column
     private String phone;
 
+    @Column
+    private Double rating;
+
     @Enumerated(EnumType.STRING)
     private UserType userType;
 

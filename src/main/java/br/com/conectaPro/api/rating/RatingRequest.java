@@ -1,7 +1,5 @@
 package br.com.conectaPro.api.rating;
 
-import java.time.LocalDateTime;
-
 import br.com.conectaPro.model.rating.EvaluateStatus;
 import br.com.conectaPro.model.rating.Rating;
 import lombok.AllArgsConstructor;
@@ -20,11 +18,9 @@ public class RatingRequest {
 
     private Long personEvaluated;
 
-    private double points;
+    private Integer points;
 
     private String description;
-
-    private LocalDateTime evaluateDate;
 
     private boolean anonymous;
 
@@ -35,7 +31,6 @@ public class RatingRequest {
         return Rating.builder()
                 .points(points)
                 .description(description)
-                .evaluateDate(evaluateDate)
                 .anonymous(anonymous)
                 .status(status)
                 .build();

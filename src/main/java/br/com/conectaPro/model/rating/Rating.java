@@ -1,7 +1,5 @@
 package br.com.conectaPro.model.rating;
 
-import java.time.LocalDateTime;
-
 import org.hibernate.annotations.SQLRestriction;
 
 import br.com.conectaPro.model.demand.Demand;
@@ -39,13 +37,10 @@ public class Rating extends AudibleEntity {
     private User personEvaluated;
 
     @Column()
-    private Double points;
+    private Integer points;
 
     @Column(length = 500)
     private String description;
-
-    @Column()
-    private LocalDateTime evaluateDate;
 
     @Column()
     private Boolean anonymous;

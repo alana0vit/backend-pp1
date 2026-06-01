@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+
 import java.util.NoSuchElementException;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,8 +18,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.conectaPro.dto.FinishRatingDTO;
 import br.com.conectaPro.model.demand.Demand;
 import br.com.conectaPro.model.demand.DemandService;
+import br.com.conectaPro.model.rating.EvaluateStatus;
 import br.com.conectaPro.model.user.UserService;
 import br.com.conectaPro.model.rating.Rating;
 import br.com.conectaPro.model.rating.RatingService;
@@ -51,6 +55,7 @@ public class RatingController {
             ratingNew.setService(service);
             ratingNew.setEvaluatingPerson(evaluator);
             ratingNew.setPersonEvaluated(evaluated);
+            ratingNew.setStatus(EvaluateStatus.PENDENTE);
 
             Rating rating = ratingService.save(ratingNew);
             return new ResponseEntity<>(rating, HttpStatus.CREATED);
@@ -72,11 +77,10 @@ public class RatingController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Rating> update(@PathVariable("id") @NotNull Long id, @RequestBody RatingRequest request) {
+    public ResponseEntity<Void> finish(@PathVariable Long id, @RequestBody FinishRatingDTO request) {
 
-        Rating rating = request.build();
-        rating.setService(demandService.getById(request.getService()));
-        ratingService.update(id, rating);
+        ratingService.finish(id, request);
+
         return ResponseEntity.ok().build();
 
     }

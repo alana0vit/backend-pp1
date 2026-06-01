@@ -88,6 +88,7 @@ public class UserService {
         user.setEmail(userChanged.getEmail());
         user.setBirthDate(userChanged.getBirthDate());
         user.setPhone(userChanged.getPhone());
+        user.setRating(userChanged.getRating());
         user.setUserType(userChanged.getUserType());
         user.setRegistryId(userChanged.getRegistryId());
 

@@ -52,6 +52,8 @@ public class UserRequest {
     )
     private String phone;
 
+    private Double rating;
+
     @NotNull()
     private UserType userType;
 
@@ -72,6 +74,7 @@ public class UserRequest {
                 .password(password)
                 .birthDate(birthDate)
                 .phone(phone)
+                .rating(rating)
                 .userType(userType)
                 .registryId(registryId)
                 .build();
