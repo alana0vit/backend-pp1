@@ -4,8 +4,6 @@ import java.time.LocalDateTime;
 
 import br.com.conectaPro.model.rating.EvaluateStatus;
 import br.com.conectaPro.model.rating.Rating;
-import br.com.conectaPro.model.user.User;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,9 +16,9 @@ import lombok.NoArgsConstructor;
 public class RatingRequest {
     private Long service;
 
-    private User evaluatingPerson;
+    private Long evaluatingPerson;
 
-    private User personEvaluated;
+    private Long personEvaluated;
 
     private double points;
 
@@ -35,8 +33,6 @@ public class RatingRequest {
     public Rating build() {
 
         return Rating.builder()
-                .evaluatingPerson(evaluatingPerson)
-                .personEvaluated(personEvaluated)
                 .points(points)
                 .description(description)
                 .evaluateDate(evaluateDate)
