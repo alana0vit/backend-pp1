@@ -88,13 +88,30 @@ public class DemandController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Demand> update(@PathVariable("id") @NonNull Long id, @RequestBody DemandRequest request) {
+    public ResponseEntity<Void> update(
+            @PathVariable Long id,
+            @RequestBody DemandRequest request) {
 
         Demand demand = request.build();
-        demand.setCategoryId(categoryService.getById(request.getCategoryId()));
-        demandService.update(id, demand);
-        return ResponseEntity.ok().build();
 
+        if (request.getCategoryId() != null) {
+            demand.setCategoryId(
+                    categoryService.getById(request.getCategoryId()));
+        }
+
+        if (request.getProfessionalId() != null) {
+            demand.setProfessionalId(
+                    userService.getById(request.getProfessionalId()));
+        }
+
+        if (request.getAddressId() != null) {
+            demand.setAddressId(
+                    userService.getAddressById(request.getAddressId()));
+        }
+
+        demandService.update(id, demand);
+
+        return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/{id}/reassign")

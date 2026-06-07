@@ -1,12 +1,10 @@
 package br.com.conectaPro.api.rating;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-
-import java.util.NoSuchElementException;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,12 +20,11 @@ import br.com.conectaPro.dto.FinishRatingDTO;
 import br.com.conectaPro.model.demand.Demand;
 import br.com.conectaPro.model.demand.DemandService;
 import br.com.conectaPro.model.rating.EvaluateStatus;
-import br.com.conectaPro.model.user.UserService;
 import br.com.conectaPro.model.rating.Rating;
 import br.com.conectaPro.model.rating.RatingService;
 import br.com.conectaPro.model.user.User;
+import br.com.conectaPro.model.user.UserService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 
 @RestController
 @RequestMapping("/api/rating")

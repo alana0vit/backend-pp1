@@ -47,16 +47,29 @@ public class DemandService {
   @Transactional
   public void update(@NonNull Long id, Demand demandChanged) {
 
-    Demand demand = repository.findById(id).get();
-    demand.setCode(demandChanged.getCode());
+    Demand demand = repository.findById(id)
+        .orElseThrow(() -> new NoSuchElementException("Solicitação não encontrada."));
+
+    if (demand.getDemandStatus() != DemandStatus.ABERTO) {
+      throw new IllegalStateException(
+          "Não é permitido editar um serviço aceito ou finalizado!");
+    }
+
     demand.setTitle(demandChanged.getTitle());
     demand.setDescription(demandChanged.getDescription());
     demand.setImgUrl(demandChanged.getImgUrl());
-    demand.setAddressId(demandChanged.getAddressId());
-    demand.setCategoryId(demandChanged.getCategoryId());
-    demand.setClientId(demandChanged.getClientId());
-    demand.setDemandStatus(demandChanged.getDemandStatus());
-    demand.setProfessionalId(demandChanged.getProfessionalId());
+
+    if (demandChanged.getAddressId() != null) {
+      demand.setAddressId(demandChanged.getAddressId());
+    }
+
+    if (demandChanged.getCategoryId() != null) {
+      demand.setCategoryId(demandChanged.getCategoryId());
+    }
+
+    if (demandChanged.getProfessionalId() != null) {
+      demand.setProfessionalId(demandChanged.getProfessionalId());
+    }
 
     repository.save(demand);
   }
@@ -82,14 +95,32 @@ public class DemandService {
   }
 
   @Transactional
-public Demand updateStatus(Long id, DemandStatus status) {
+  public Demand updateStatus(Long id, DemandStatus status) {
     Demand demand = repository.findById(id)
         .orElseThrow(() -> new NoSuchElementException());
 
-    demand.setDemandStatus(status);
+    switch (demand.getDemandStatus()) {
+
+      case ABERTO:
+        if (status != DemandStatus.AGUARDANDO &&
+            status != DemandStatus.REJEITADO) {
+          throw new IllegalStateException("Transição inválida");
+        }
+        break;
+
+      case AGUARDANDO:
+        if (status != DemandStatus.FECHADO) {
+          throw new IllegalStateException("Transição inválida");
+        }
+        break;
+
+      default:
+        throw new IllegalStateException(
+            "Demanda não pode mais mudar de status");
+    }
 
     return repository.save(demand);
-}
+  }
 
   @Transactional
   public void delete(@NonNull Long id) {
