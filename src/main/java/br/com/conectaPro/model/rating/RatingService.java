@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import br.com.conectaPro.dto.FinishRatingDTO;
 import br.com.conectaPro.model.user.User;
@@ -25,14 +26,20 @@ public class RatingService {
         return repository.save(rating);
     }
 
-    public List<Rating> getAll() {
-        return repository.findAll();
+    public List<Rating> getByUser(Long userId) {
+        return repository.findRatingsByUser(userId);
     }
 
-    public Rating getById(Long id) {
+    public Rating getUserRating(Long userId, Long ratingId) {
 
-        return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Avaliação não encontrada"));
+        Rating rating = repository.findById(ratingId)
+                .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada"));
+
+        if (!rating.getPersonEvaluated().getId().equals(userId)) {
+            throw new IllegalStateException("Essa avaliação não pertence ao usuário informado");
+        }
+
+        return rating;
     }
 
     @Transactional
@@ -81,7 +88,7 @@ public class RatingService {
         Double avg = repository.calculateAverageByUser(
                 evaluated.getId());
 
-        evaluated.setRating(avg);
+        evaluated.setRating(avg != null ? avg : 0.0);
 
         userRepository.save(evaluated);
     }

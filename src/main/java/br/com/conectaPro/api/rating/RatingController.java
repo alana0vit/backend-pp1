@@ -31,10 +31,7 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/rating")
 @CrossOrigin
-@Tag (
-    name = "Rating",
-    description = "Avaliação pós serviço"
-)
+@Tag(name = "Rating", description = "Avaliação pós serviço")
 public class RatingController {
 
     @Autowired
@@ -46,9 +43,7 @@ public class RatingController {
     @Autowired
     private UserService userService;
 
-    @Operation (
-        summary = "Criar entidade Avaliação"
-    )
+    @Operation(summary = "Criar entidade Avaliação")
     @PostMapping()
     public ResponseEntity<?> save(@RequestBody @Valid RatingRequest request) {
 
@@ -72,26 +67,22 @@ public class RatingController {
         }
     }
 
-    @Operation (
-        summary = "Lista todas as avaliações de um usuario"
-    )
-    @GetMapping
-    public List<Rating> getAll() {
-        return ratingService.getAll();
+    @Operation(summary = "Lista todas as avaliações de um usuario")
+    @GetMapping("/user/{userId}")
+    public List<Rating> getByUser(@PathVariable Long userId) {
+        return ratingService.getByUser(userId);
     }
 
-    @Operation (
-        summary = "Lista uma avaliação especifica de usuario"
-    )
-    @GetMapping("/{id}")
-    public Rating getById(@PathVariable Long id) {
-        return ratingService.getById(id);
+    @Operation(summary = "Lista uma avaliação especifica de usuario")
+    @GetMapping("/user/{userId}/rating/{ratingId}")
+    public Rating getUserRating(
+            @PathVariable Long userId,
+            @PathVariable Long ratingId) {
+
+        return ratingService.getUserRating(userId, ratingId);
     }
 
-    @Operation (
-        summary = "Usuario preenche avaliação",
-        description = "Em teoria, o user nunca atualiza a avaliação"
-    )
+    @Operation(summary = "Usuario preenche avaliação", description = "Em teoria, o user nunca atualiza a avaliação")
     @PutMapping("/{id}")
     public ResponseEntity<Void> finish(@PathVariable Long id, @RequestBody FinishRatingDTO request) {
 
