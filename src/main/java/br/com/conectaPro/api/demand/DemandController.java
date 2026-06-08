@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +37,10 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/demand")
 @CrossOrigin
+@Tag (
+    name = "Demand",
+    description = "Demandas/serviços abertos pelo user do tipo cliente"
+)
 public class DemandController {
     @Autowired
     private DemandService demandService;
@@ -44,6 +51,9 @@ public class DemandController {
     @Autowired
     private UserService userService;
 
+    @Operation (
+        summary = "Criar entidade demanda"
+    )
     @PostMapping
     public ResponseEntity<?> save(@RequestBody @Valid DemandRequest request) {
 
@@ -77,16 +87,25 @@ public class DemandController {
         }
     }
 
+    @Operation (
+        summary = "Lista todas as demandas de um cliente"
+    )
     @GetMapping("/user")
     public List<Demand> getAll() {
         return demandService.getAll();
     }
 
+    @Operation (
+        summary = "Lista uma demanda especifica de um cliente"
+    )
     @GetMapping("/user/{id}")
     public Demand getById(@PathVariable @NonNull Long id) {
         return demandService.getById(id);
     }
 
+    @Operation (
+        summary = "Atualiza campos especificos da demanda"
+    )
     @PutMapping("/{id}")
     public ResponseEntity<Void> update(
             @PathVariable Long id,
@@ -114,6 +133,9 @@ public class DemandController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation (
+        summary = "Permite atualizar o profissional após a demanda ser rejeitada"
+    )
     @PatchMapping("/{id}/reassign")
     public ResponseEntity<Demand> reassignProfessional(
             @PathVariable @NonNull Long id,
@@ -123,6 +145,9 @@ public class DemandController {
 
     }
 
+    @Operation (
+        summary = "Atualiza o status da demanda"
+    )
     @PatchMapping("/{id}/status")
     public ResponseEntity<Demand> updateStatus(
             @PathVariable Long id,
@@ -131,6 +156,9 @@ public class DemandController {
         return ResponseEntity.ok(updated);
     }
 
+    @Operation (
+        summary = "Deleta uma demanda"
+    )
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable @NonNull Long id) {
 

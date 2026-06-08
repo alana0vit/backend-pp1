@@ -21,14 +21,22 @@ import br.com.conectaPro.model.user.AddressUser;
 import br.com.conectaPro.model.user.User;
 import br.com.conectaPro.model.user.UserService;
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/user")
 @CrossOrigin
+@Tag (
+    name = "User/Address"
+)
 public class UserController {
     @Autowired
     private UserService userService;
 
+    @Operation (
+        summary = "Criar entidade usuário"
+    )
     @PostMapping
     public ResponseEntity<User> save(@RequestBody @Valid UserRequest request) {
         // Passando a lista de categorias e a entidade separados
@@ -36,17 +44,26 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
+    @Operation (
+        summary = "Lista todos os usuarios"
+    )
     @GetMapping
     public List<User> getAll() {
         return userService.getAll();
     }
 
+    @Operation (
+        summary = "Lista um usuario especifico pelo seu ID"
+    )
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> getById(@PathVariable Long id) {
         User user = userService.getById(id);
         return ResponseEntity.ok(UserResponseDTO.fromEntity(user));
     }
 
+    @Operation (
+        summary = "Atualiza um usuario pelo seu ID"
+    )
     @PutMapping("/{id}")
     public ResponseEntity<User> update(@PathVariable("id") Long id, @RequestBody UserRequest request) {
 
@@ -55,6 +72,9 @@ public class UserController {
 
     }
 
+    @Operation (
+        summary = "Deleta um usuario pelo seu ID"
+    )
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
 
@@ -64,6 +84,9 @@ public class UserController {
 
     // Filtros de busca para user do tipo "PROFESSIONAL"
 
+    @Operation (
+        summary = "Filtro de busca por profissional"
+    )
     @GetMapping("/search")
     public ResponseEntity<List<UserResponseDTO>> search(
             @RequestParam(required = false) String name,
@@ -80,16 +103,25 @@ public class UserController {
 
     // Endereços
 
+    @Operation (
+        summary = "Lista todos os endereços de um usuario"
+    )
     @GetMapping("/{userId}/addresses")
     public List<AddressUser> getAllAddresses(@PathVariable Long userId) {
         return userService.getAllAddressByUser(userId);
     }
 
+    @Operation (
+        summary = "Lista um endereço especifico"
+    )
     @GetMapping("/addresses/{addressId}")
     public AddressUser getAddressById(@PathVariable Long addressId) {
         return userService.getAddressById(addressId);
     }
 
+    @Operation (
+        summary = "Criar endereço para um usuario"
+    )
     @PostMapping("/{userId}/addresses")
     public ResponseEntity<AddressUser> postAddressUser(@PathVariable("userId") Long userId,
             @RequestBody @Valid AddressUserRequest request) {
@@ -98,6 +130,9 @@ public class UserController {
         return new ResponseEntity<>(address, HttpStatus.CREATED);
     }
 
+    @Operation (
+        summary = "Atualiza um endereço pelo seu ID"
+    )
     @PutMapping("/address/{addressId}")
     public ResponseEntity<AddressUser> updateAddressUser(@PathVariable("addressId") Long addressId,
             @RequestBody AddressUserRequest request) {
@@ -106,6 +141,9 @@ public class UserController {
         return new ResponseEntity<>(address, HttpStatus.OK);
     }
 
+    @Operation (
+        summary = "Deleta um endereço pelo seu ID"
+    )
     @DeleteMapping("/address/{addressId}")
     public ResponseEntity<Void> deleteAddressUser(@PathVariable("addressId") Long addressId) {
 

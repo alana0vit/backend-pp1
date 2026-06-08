@@ -2,6 +2,9 @@ package br.com.conectaPro.api.category;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +25,17 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/category")
 @CrossOrigin
+@Tag (
+    name = "Category",
+    description = "Categorias atreladas aos profissionais para classificar o tipo de serviço que executam"
+)
 public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
+    @Operation (
+        summary = "Criar entidade categoria"
+    )
     @PostMapping
     public ResponseEntity<Category> save(@RequestBody @Valid CategoryRequest request) {
 
@@ -33,16 +43,25 @@ public class CategoryController {
         return new ResponseEntity<>(category, HttpStatus.CREATED);
     }
 
+    @Operation (
+        summary = "Lista todas as categorias"
+    )
     @GetMapping
     public List<Category> getAll() {
         return categoryService.getAll();
     }
 
+    @Operation (
+        summary = "Lista uma categoria pelo ID"
+    )
     @GetMapping("/{id}")
     public Category getById(@PathVariable Long id) {
         return categoryService.getById(id);
     }
 
+    @Operation (
+        summary = "Atualiza uma categoria pelo seu ID"
+    )
     @PutMapping("/{id}")
     public ResponseEntity<Category> update(@PathVariable("id") Long id, @RequestBody CategoryRequest request) {
 
@@ -51,11 +70,13 @@ public class CategoryController {
 
     }
 
+    @Operation (
+        summary = "Deleta uma categoria pelo seu ID"
+    )
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
 
         categoryService.delete(id);
         return ResponseEntity.ok().build();
     }
-    
 }

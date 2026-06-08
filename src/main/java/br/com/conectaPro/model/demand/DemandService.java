@@ -97,13 +97,19 @@ public class DemandService {
   @Transactional
   public Demand updateStatus(Long id, DemandStatus status) {
     Demand demand = repository.findById(id)
-        .orElseThrow(() -> new NoSuchElementException());
+        .orElseThrow(() -> new NoSuchElementException("Demanda não encontrada."));
 
-    switch (demand.getDemandStatus()) {
+    DemandStatus currentStatus = demand.getDemandStatus();
 
+    // Impede qualquer alteração para ABERTO via updateStatus, apenas pelo endpoint reassing()
+    if (status == DemandStatus.ABERTO && currentStatus == DemandStatus.REJEITADO) {
+      throw new IllegalStateException(
+          "Não é permitido reabrir uma demanda rejeitada pelo endpoint de status. Use /reassign.");
+    }
+
+    switch (currentStatus) {
       case ABERTO:
-        if (status != DemandStatus.AGUARDANDO &&
-            status != DemandStatus.REJEITADO) {
+        if (status != DemandStatus.AGUARDANDO && status != DemandStatus.REJEITADO) {
           throw new IllegalStateException("Transição inválida");
         }
         break;
@@ -114,10 +120,14 @@ public class DemandService {
         }
         break;
 
-      default:
-        throw new IllegalStateException(
-            "Demanda não pode mais mudar de status");
+      case FECHADO:
+        throw new IllegalStateException("Não é possível alterar este status");
+
+      case REJEITADO:
+        throw new IllegalStateException("Não é permitido alterar o status desta demanda por este endpoint");
     }
+
+    demand.setDemandStatus(status);
 
     return repository.save(demand);
   }

@@ -85,13 +85,4 @@ public class RatingService {
 
         userRepository.save(evaluated);
     }
-
-    @Transactional
-    public void delete(Long id) {
-
-        Rating rating = repository.findById(id).get();
-        rating.setEnabled(Boolean.FALSE);
-
-        repository.save(rating);
-    }
 }

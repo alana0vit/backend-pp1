@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import br.com.conectaPro.dto.LoginRequestDTO;
 import br.com.conectaPro.dto.LoginResponseDTO;
 import br.com.conectaPro.model.user.User;
@@ -18,10 +21,16 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Tag (
+    name = "Auth/Login"
+)
 public class AuthController {
 
     private final UserRepository userRepository;
 
+    @Operation (
+        summary = "Faz login no sistema"
+    )
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO request) {
 
