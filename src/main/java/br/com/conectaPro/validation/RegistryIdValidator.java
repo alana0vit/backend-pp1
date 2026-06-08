@@ -19,12 +19,15 @@ public class RegistryIdValidator implements ConstraintValidator<ValidRegistryId,
             return false;
         }
 
+        String registryId = user.getRegistryId();
+
         if (user.getUserType() == UserType.CLIENT) {
-            return cpfValidator.isValid(user.getRegistryId(), null);
+            return cpfValidator.isValid(registryId, null);
         }
 
         if (user.getUserType() == UserType.PROFESSIONAL) {
-            return cnpjValidator.isValid(user.getRegistryId(), null);
+            return cpfValidator.isValid(registryId, null)
+                    || cnpjValidator.isValid(registryId, null);
         }
 
         return false;
