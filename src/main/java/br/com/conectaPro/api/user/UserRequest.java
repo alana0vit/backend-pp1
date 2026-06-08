@@ -33,6 +33,8 @@ public class UserRequest {
     @Length(max = 100, message = "O Nome deverá ter no máximo {max} caracteres")
     private String name;
 
+    private String enterprise;
+
     @NotBlank()
     @Email
     private String email;
@@ -70,6 +72,7 @@ public class UserRequest {
 
         return User.builder()
                 .name(name)
+                .enterprise(enterprise)
                 .email(email)
                 .password(password)
                 .birthDate(birthDate)

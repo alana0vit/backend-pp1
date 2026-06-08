@@ -1,5 +1,7 @@
 package br.com.conectaPro.api.demand;
 
+import java.time.LocalDate;
+
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.URL;
 
@@ -32,6 +34,10 @@ public class DemandRequest {
     @URL()
     private String imgUrl;
 
+    private Double suggestedValue;
+
+    private LocalDate suggestedDate;
+
     @NotNull()
     private Long addressId;
 
@@ -53,6 +59,8 @@ public class DemandRequest {
                 .title(title)
                 .description(description)
                 .imgUrl(imgUrl)
+                .suggestedValue(suggestedValue)
+                .suggestedDate(suggestedDate)
                 .demandStatus(demandStatus)
                 .build();
     }

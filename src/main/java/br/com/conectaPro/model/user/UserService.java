@@ -85,6 +85,7 @@ public class UserService {
         validateProfessionalCategories(userChanged.getUserType(), categoryIds);
 
         user.setName(userChanged.getName());
+        user.setEnterprise(userChanged.getEnterprise());
         user.setEmail(userChanged.getEmail());
         user.setBirthDate(userChanged.getBirthDate());
         user.setPhone(userChanged.getPhone());

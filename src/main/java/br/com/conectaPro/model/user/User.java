@@ -36,6 +36,9 @@ public class User extends AudibleEntity {
     @Column(nullable = false, length = 100)
     private String name;
 
+    @Column(nullable = true)
+    private String enterprise;
+
     @Column(unique = true)
     private String email;
 

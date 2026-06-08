@@ -2,14 +2,16 @@ package br.com.conectaPro.model.demand;
 
 import org.hibernate.annotations.SQLRestriction;
 
+import java.time.LocalDate;
+
 import br.com.conectaPro.model.category.Category;
 import br.com.conectaPro.model.user.AddressUser;
 import br.com.conectaPro.model.user.User;
 import br.com.conectaPro.util.entity.AudibleEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -39,6 +41,12 @@ public class Demand extends AudibleEntity {
 
     @Column
     private String imgUrl;
+
+    @Column
+    private Double suggestedValue;
+
+    @Column
+    private LocalDate suggestedDate;
 
     @ManyToOne
     private AddressUser addressId;
