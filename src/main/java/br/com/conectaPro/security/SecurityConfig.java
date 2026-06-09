@@ -58,8 +58,10 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Permite a origem do seu front-end (Vite)
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+        // Permite a origem do seu front-end (Vite) e agora no expo go também
+        //configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+
 
         // Permite os métodos HTTP principais
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
