@@ -3,7 +3,6 @@ package br.com.conectaPro.api.demand;
 import java.time.LocalDate;
 
 import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.URL;
 
 import br.com.conectaPro.model.demand.Demand;
 import br.com.conectaPro.model.demand.DemandStatus;
@@ -31,9 +30,6 @@ public class DemandRequest {
     @Length(max = 500, message = "A descrição deverá ter no máximo {max} caracteres")
     private String description;
 
-    @URL()
-    private String imgUrl;
-
     private Double suggestedValue;
 
     private LocalDate suggestedDate;
@@ -58,7 +54,6 @@ public class DemandRequest {
                 .code(code)
                 .title(title)
                 .description(description)
-                .imgUrl(imgUrl)
                 .suggestedValue(suggestedValue)
                 .suggestedDate(suggestedDate)
                 .demandStatus(demandStatus)

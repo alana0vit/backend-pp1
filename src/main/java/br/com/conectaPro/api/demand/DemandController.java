@@ -4,8 +4,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.MediaType;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,12 +13,15 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import br.com.conectaPro.dto.ReassignRequestDTO;
 import br.com.conectaPro.dto.StatusUpdateDTO;
@@ -31,15 +33,15 @@ import br.com.conectaPro.model.demand.DemandStatus;
 import br.com.conectaPro.model.user.AddressUser;
 import br.com.conectaPro.model.user.User;
 import br.com.conectaPro.model.user.UserService;
+import br.com.conectaPro.util.Util;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/demand")
 @CrossOrigin
-@Tag (
-    name = "Demand",
-    description = "Demandas/serviços abertos pelo user do tipo cliente"
-)
+@Tag(name = "Demand", description = "Demandas/serviços abertos pelo user do tipo cliente")
 public class DemandController {
     @Autowired
     private DemandService demandService;
@@ -50,11 +52,11 @@ public class DemandController {
     @Autowired
     private UserService userService;
 
-    @Operation (
-        summary = "Criar entidade demanda"
-    )
-    @PostMapping
-    public ResponseEntity<?> save(@RequestBody @Valid DemandRequest request) {
+    @Operation(summary = "Criar entidade demanda")
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> save(
+            @Valid @ModelAttribute DemandRequest request,
+            @RequestParam(value = "imagem", required = false) MultipartFile imagem) {
 
         // TODO: Futuramente, mover essas validações para um @RestControllerAdvice
         // usando exceptions customizadas (ex: EntityNotFoundException).
@@ -74,6 +76,16 @@ public class DemandController {
             demandNew.setDemandStatus(DemandStatus.ABERTO);
             String demandCode = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
             demandNew.setCode(demandCode);
+            if (imagem != null && !imagem.isEmpty()) {
+
+                String nomeArquivo = Util.fazerUploadImagem(imagem);
+
+                if (nomeArquivo == null) {
+                    throw new RuntimeException("Erro ao salvar imagem");
+                }
+
+                demandNew.setImgUrl(nomeArquivo);
+            }
 
             Demand demand = demandService.save(demandNew);
             return new ResponseEntity<>(demand, HttpStatus.CREATED);
@@ -86,25 +98,19 @@ public class DemandController {
         }
     }
 
-    @Operation (
-        summary = "Lista todas as demandas de um cliente"
-    )
+    @Operation(summary = "Lista todas as demandas de um cliente")
     @GetMapping("/user")
     public List<Demand> getAll() {
         return demandService.getAll();
     }
 
-    @Operation (
-        summary = "Lista uma demanda especifica de um cliente"
-    )
+    @Operation(summary = "Lista uma demanda especifica de um cliente")
     @GetMapping("/user/{id}")
     public Demand getById(@PathVariable @NonNull Long id) {
         return demandService.getById(id);
     }
 
-    @Operation (
-        summary = "Atualiza campos especificos da demanda"
-    )
+    @Operation(summary = "Atualiza campos especificos da demanda")
     @PatchMapping("/{id}")
     public ResponseEntity<Void> update(
             @PathVariable Long id,
@@ -132,9 +138,7 @@ public class DemandController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation (
-        summary = "Permite atualizar o profissional após a demanda ser rejeitada"
-    )
+    @Operation(summary = "Permite atualizar o profissional após a demanda ser rejeitada")
     @PatchMapping("/{id}/reassign")
     public ResponseEntity<Demand> reassignProfessional(
             @PathVariable @NonNull Long id,
@@ -144,9 +148,7 @@ public class DemandController {
 
     }
 
-    @Operation (
-        summary = "Atualiza o status da demanda"
-    )
+    @Operation(summary = "Atualiza o status da demanda")
     @PatchMapping("/{id}/status")
     public ResponseEntity<Demand> updateStatus(
             @PathVariable Long id,
@@ -155,9 +157,7 @@ public class DemandController {
         return ResponseEntity.ok(updated);
     }
 
-    @Operation (
-        summary = "Deleta uma demanda"
-    )
+    @Operation(summary = "Deleta uma demanda")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable @NonNull Long id) {
 
