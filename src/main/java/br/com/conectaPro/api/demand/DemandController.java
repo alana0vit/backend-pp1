@@ -111,12 +111,24 @@ public class DemandController {
     }
 
     @Operation(summary = "Atualiza campos especificos da demanda")
-    @PatchMapping("/{id}")
+    @PatchMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> update(
             @PathVariable Long id,
-            @RequestBody DemandRequest request) {
+            @ModelAttribute DemandRequest request,
+            @RequestParam(value = "imagem", required = false) MultipartFile imagem) {
 
         Demand demand = request.build();
+
+        if (imagem != null && !imagem.isEmpty()) {
+
+            String nomeArquivo = Util.fazerUploadImagem(imagem);
+
+            if (nomeArquivo == null) {
+                throw new RuntimeException("Erro ao salvar imagem");
+            }
+
+            demand.setImgUrl(nomeArquivo);
+        }
 
         if (request.getCategoryId() != null) {
             demand.setCategoryId(

@@ -35,12 +35,10 @@ public class DemandService {
   }
 
   public List<Demand> getAll() {
-
     return repository.findAll();
   }
 
   public Demand getById(@NonNull Long id) {
-
     return repository.findById(id).get();
   }
 
@@ -57,7 +55,10 @@ public class DemandService {
 
     demand.setTitle(demandChanged.getTitle());
     demand.setDescription(demandChanged.getDescription());
-    demand.setImgUrl(demandChanged.getImgUrl());
+    
+    if (demandChanged.getImgUrl() != null) {
+      demand.setImgUrl(demandChanged.getImgUrl());
+    }
 
     if (demandChanged.getAddressId() != null) {
       demand.setAddressId(demandChanged.getAddressId());
@@ -101,7 +102,8 @@ public class DemandService {
 
     DemandStatus currentStatus = demand.getDemandStatus();
 
-    // Impede qualquer alteração para ABERTO via updateStatus, apenas pelo endpoint reassing()
+    // Impede qualquer alteração para ABERTO via updateStatus, apenas pelo endpoint
+    // reassing()
     if (status == DemandStatus.ABERTO && currentStatus == DemandStatus.REJEITADO) {
       throw new IllegalStateException(
           "Não é permitido reabrir uma demanda rejeitada pelo endpoint de status. Use /reassign.");
