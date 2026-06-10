@@ -2,6 +2,8 @@ package br.com.conectaPro.security;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,6 +22,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
 
@@ -32,54 +36,40 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);
-        } else if (request.getServletPath().contains("/auth")) { // Pular o filtro para as rotas de autenticação para
-                                                                 // evitar loops
             filterChain.doFilter(request, response);
             return;
         }
 
-        final String jwt;
-        final String userEmail;
+        if (request.getServletPath().contains("/auth")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-        // Localiza onde você verifica o authHeader
         final String authHeader = request.getHeader("Authorization");
-
-        // Se for nulo ou não começar com Bearer, apenas passe para o próximo filtro
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
-            return; // O return é CRUCIAL aqui para parar a execução deste filtro
+            return;
         }
 
-        // Extrai o token jwt
-        jwt = authHeader.substring(7);
+        try {
+            final String jwt = authHeader.substring(7);
+            final String userEmail = jwtService.extractUsername(jwt);
 
-        // Extrai o email do user pelo token
-        userEmail = jwtService.extractUsername(jwt);
-
-        // Se temo o email do user e ele não está autenticado no contexto atual
-        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-            // Carrega os dados do usuário
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-
-            // Valida o token
-            if (jwtService.isTokenValid(userEmail, userDetails)) {
-
-                // Cria o token para autenticação com o Spring Security
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                        userEmail, userDetails);
-
-                // Adicionar os detalhes da requisição (IP, sessão, etc)
-                authenticationToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request));
-
-                // Atualiza o contexto de segurança
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+                if (jwtService.isTokenValid(userEmail, userDetails)) {
+                    UsernamePasswordAuthenticationToken authenticationToken =
+                            new UsernamePasswordAuthenticationToken(userEmail, userDetails);
+                    authenticationToken.setDetails(
+                            new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                }
             }
+        } catch (Exception e) {
+            logger.warn("Falha ao processar token JWT: {}", e.getMessage());
+            // não autentica, mas a requisição continua
         }
 
-        // Passar a requisição adiante na cadeia de filtros
         filterChain.doFilter(request, response);
     }
-
 }
