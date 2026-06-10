@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
+    Optional<User> findByRecoveryToken(String recoveryToken);
 
     /**
      * (Débito Técnico para o futuro pra Alana e JP)

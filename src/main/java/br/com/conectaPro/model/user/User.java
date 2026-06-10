@@ -1,6 +1,7 @@
 package br.com.conectaPro.model.user;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.hibernate.annotations.SQLRestriction;
@@ -59,6 +60,12 @@ public class User extends AudibleEntity {
 
     @Column
     private String registryId;
+
+    @Column
+    private String recoveryToken;
+
+    @Column
+    private LocalDateTime recoveryTokenExpiration;
 
     @OneToMany(mappedBy = "userId", orphanRemoval = true, fetch = FetchType.EAGER)
     private List<AddressUser> adresses;
