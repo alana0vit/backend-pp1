@@ -15,19 +15,21 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("OxeFood API")
+                        .title("ConectaPro")
                         .version("1.0")
-                        .description("API do OxeFood")
+                        .description("API do ConectaPro")
                         .contact(new Contact()
-                                .name("Aluno IFPE")
-                                .email("aluno@discente.ifpe.edu.br")));
+                                .name("ConectaPro")
+                                .email("conectaPro@hotmail.com.br")));
     }
 
     @Bean
     public GroupedOpenApi customApi() {
         return GroupedOpenApi.builder()
                 .group("api")
-                .pathsToMatch("/api/**")
+                .pathsToMatch(
+                        "/api/**",
+                        "/auth/**")
                 .pathsToExclude("/error", "/actuator/**")
                 .build();
     }
