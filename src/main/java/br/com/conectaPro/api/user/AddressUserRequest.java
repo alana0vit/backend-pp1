@@ -35,10 +35,6 @@ public class AddressUserRequest {
     )
     private String zipCode;
 
-    private Double latitude;
-
-    private Double longitude;
-
     private String supplement;
 
     public AddressUser build() {
@@ -50,8 +46,6 @@ public class AddressUserRequest {
                 .city(city)
                 .state(state)
                 .zipCode(zipCode)
-                .latitude(latitude)
-                .longitude(longitude)
                 .supplement(supplement)
                 .build();
     }

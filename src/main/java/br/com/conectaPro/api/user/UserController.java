@@ -27,43 +27,32 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("/api/user")
 @CrossOrigin
-@Tag (
-    name = "User/Address"
-)
+@Tag(name = "User/Address")
 public class UserController {
     @Autowired
     private UserService userService;
 
-    @Operation (
-        summary = "Criar entidade usuário"
-    )
+    @Operation(summary = "Criar entidade usuário")
     @PostMapping
     public ResponseEntity<User> save(@RequestBody @Valid UserRequest request) {
-        // Passando a lista de categorias e a entidade separados
         User user = userService.save(request);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
-    @Operation (
-        summary = "Lista todos os usuarios"
-    )
+    @Operation(summary = "Lista todos os usuarios")
     @GetMapping
     public List<User> getAll() {
         return userService.getAll();
     }
 
-    @Operation (
-        summary = "Lista um usuario especifico pelo seu ID"
-    )
+    @Operation(summary = "Lista um usuario especifico pelo seu ID")
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> getById(@PathVariable Long id) {
         User user = userService.getById(id);
         return ResponseEntity.ok(UserResponseDTO.fromEntity(user));
     }
 
-    @Operation (
-        summary = "Atualiza um usuario pelo seu ID"
-    )
+    @Operation(summary = "Atualiza um usuario pelo seu ID")
     @PutMapping("/{id}")
     public ResponseEntity<User> update(@PathVariable("id") Long id, @RequestBody UserRequest request) {
 
@@ -72,9 +61,7 @@ public class UserController {
 
     }
 
-    @Operation (
-        summary = "Deleta um usuario pelo seu ID"
-    )
+    @Operation(summary = "Deleta um usuario pelo seu ID")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
 
@@ -82,19 +69,18 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    // Filtros de busca para user do tipo "PROFESSIONAL"
-
-    @Operation (
-        summary = "Filtro de busca por profissional"
-    )
+    @Operation(summary = "Filtro de busca por profissional")
     @GetMapping("/search")
     public ResponseEntity<List<UserResponseDTO>> search(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Long categoryId,
-            @RequestParam(required = false) Double latitude,
-            @RequestParam(required = false) Double longitude,
+            @RequestParam(required = false) Long addressId,
             @RequestParam(required = false) Double radiusKm) {
-        List<User> users = userService.search(name, categoryId, latitude, longitude, radiusKm);
+        List<User> users = userService.search(
+                name,
+                categoryId,
+                addressId,
+                radiusKm);
         List<UserResponseDTO> response = users.stream()
                 .map(UserResponseDTO::fromEntity)
                 .toList();
@@ -103,25 +89,19 @@ public class UserController {
 
     // Endereços
 
-    @Operation (
-        summary = "Lista todos os endereços de um usuario"
-    )
+    @Operation(summary = "Lista todos os endereços de um usuario")
     @GetMapping("/{userId}/addresses")
     public List<AddressUser> getAllAddresses(@PathVariable Long userId) {
         return userService.getAllAddressByUser(userId);
     }
 
-    @Operation (
-        summary = "Lista um endereço especifico"
-    )
+    @Operation(summary = "Lista um endereço especifico")
     @GetMapping("/addresses/{addressId}")
     public AddressUser getAddressById(@PathVariable Long addressId) {
         return userService.getAddressById(addressId);
     }
 
-    @Operation (
-        summary = "Criar endereço para um usuario"
-    )
+    @Operation(summary = "Criar endereço para um usuario")
     @PostMapping("/{userId}/addresses")
     public ResponseEntity<AddressUser> postAddressUser(@PathVariable("userId") Long userId,
             @RequestBody @Valid AddressUserRequest request) {
@@ -130,9 +110,7 @@ public class UserController {
         return new ResponseEntity<>(address, HttpStatus.CREATED);
     }
 
-    @Operation (
-        summary = "Atualiza um endereço pelo seu ID"
-    )
+    @Operation(summary = "Atualiza um endereço pelo seu ID")
     @PutMapping("/address/{addressId}")
     public ResponseEntity<AddressUser> updateAddressUser(@PathVariable("addressId") Long addressId,
             @RequestBody AddressUserRequest request) {
@@ -141,9 +119,7 @@ public class UserController {
         return new ResponseEntity<>(address, HttpStatus.OK);
     }
 
-    @Operation (
-        summary = "Deleta um endereço pelo seu ID"
-    )
+    @Operation(summary = "Deleta um endereço pelo seu ID")
     @DeleteMapping("/address/{addressId}")
     public ResponseEntity<Void> deleteAddressUser(@PathVariable("addressId") Long addressId) {
 

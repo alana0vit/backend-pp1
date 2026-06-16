@@ -16,14 +16,6 @@ public class DemandService {
   @Autowired
   private DemandRepository repository;
 
-  /*
-   * Alana, se a gente precisar fazer com que o
-   * UserService chame métodos do DemandService (User -> Demand),
-   * o Spring lançará um erro de Dependência Circular (Circular Dependency Error).
-   * Se isso acontecer um dia, a solução geralmente é extrair a lógica que os dois
-   * precisam para um terceiro Service, ou fazer a orquestração diretamente na
-   * camada do Controller
-   */
   @Autowired
   private UserService userService;
 
@@ -55,7 +47,7 @@ public class DemandService {
 
     demand.setTitle(demandChanged.getTitle());
     demand.setDescription(demandChanged.getDescription());
-    
+
     if (demandChanged.getImgUrl() != null) {
       demand.setImgUrl(demandChanged.getImgUrl());
     }

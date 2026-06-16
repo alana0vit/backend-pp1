@@ -24,7 +24,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
      */
 
     @Query(value = """
-            SELECT u.* FROM Users u
+            SELECT DISTINCT u.* FROM Users u
             JOIN Address a ON a.user_id_id = u.id
             LEFT JOIN user_category uc ON uc.user_id = u.id
             WHERE u.enabled = true

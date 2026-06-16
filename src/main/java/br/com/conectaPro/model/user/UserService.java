@@ -6,22 +6,33 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import br.com.conectaPro.api.user.UserRequest;
+import br.com.conectaPro.dto.CoordinatesDTO;
 import br.com.conectaPro.model.category.Category;
 import br.com.conectaPro.model.category.CategoryRepository;
+import br.com.conectaPro.util.GeoLocationService;
 import jakarta.transaction.Transactional;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
+
     private final AddressUserRepository addressUserRepository;
+
     private final CategoryRepository categoryRepository;
 
-    public UserService(UserRepository repository, AddressUserRepository addressUserRepository,
-            CategoryRepository categoryRepository) {
+    private final GeoLocationService geoLocationService;
+
+    public UserService(
+            UserRepository repository,
+            AddressUserRepository addressUserRepository,
+            CategoryRepository categoryRepository,
+            GeoLocationService geoLocationService) {
+
         this.userRepository = repository;
         this.addressUserRepository = addressUserRepository;
         this.categoryRepository = categoryRepository;
+        this.geoLocationService = geoLocationService;
     }
 
     @Transactional
@@ -40,6 +51,29 @@ public class UserService {
 
         // Instancia e salva o Address vinculado ao User
         AddressUser addressUser = userRequest.getAddress().build();
+        try {
+
+            CoordinatesDTO coords = geoLocationService.getCoordinates(addressUser);
+
+            addressUser.setLatitude(
+                    Double.parseDouble(coords.getLat()));
+
+            addressUser.setLongitude(
+                    Double.parseDouble(coords.getLon()));
+
+            System.out.println(
+                    "LAT: " + addressUser.getLatitude());
+
+            System.out.println(
+                    "LNG: " + addressUser.getLongitude());
+
+        } catch (Exception e) {
+
+            System.out.println(
+                    "ERRO GEOLOCALIZACAO: "
+                            + e.getMessage());
+
+        }
         addressUser.setUserId(savedUser);
         addressUser.setEnabled(Boolean.TRUE);
         addressUserRepository.save(addressUser);
@@ -68,12 +102,10 @@ public class UserService {
     }
 
     public List<User> getAll() {
-
         return userRepository.findAll();
     }
 
     public User getById(Long id) {
-
         return userRepository.findById(id).get();
     }
 
@@ -125,14 +157,33 @@ public class UserService {
 
     // Filtros de busca para user do tipo "PROFESSIONAL"
 
-    public List<User> search(String name, Long categoryId,
-            Double lat, Double lng, Double radiusKm) {
+    public List<User> search(
+            String name,
+            Long categoryId,
+            Long addressId,
+            Double radiusKm) {
 
         if (radiusKm != null && radiusKm > 20) {
             throw new IllegalArgumentException("Distância máxima permitida alcançada");
         }
 
-        return userRepository.searchUsers(name, categoryId, lat, lng, radiusKm);
+        Double lat = null;
+        Double lng = null;
+
+        if (addressId != null) {
+
+            AddressUser address = getAddressById(addressId);
+
+            lat = address.getLatitude();
+            lng = address.getLongitude();
+        }
+
+        return userRepository.searchUsers(
+                name,
+                categoryId,
+                lat,
+                lng,
+                radiusKm);
     }
 
     // Endereços
@@ -148,12 +199,33 @@ public class UserService {
     }
 
     @Transactional
-    public AddressUser postAddressUser(Long userId, AddressUser address) {
+    public AddressUser postAddressUser(
+            Long userId,
+            AddressUser address) {
 
         User user = this.getById(userId);
 
+        try {
+
+            CoordinatesDTO coords = geoLocationService.getCoordinates(address);
+
+            address.setLatitude(
+                    Double.parseDouble(coords.getLat()));
+
+            address.setLongitude(
+                    Double.parseDouble(coords.getLon()));
+
+        } catch (Exception e) {
+
+            System.out.println(
+                    "ERRO GEOLOCALIZACAO: "
+                            + e.getMessage());
+
+        }
+
         address.setUserId(user);
         address.setEnabled(Boolean.TRUE);
+
         addressUserRepository.save(address);
 
         List<AddressUser> listAddressUser = user.getAdresses();
@@ -163,7 +235,9 @@ public class UserService {
         }
 
         listAddressUser.add(address);
+
         user.setAdresses(listAddressUser);
+
         userRepository.save(user);
 
         return address;
@@ -179,8 +253,11 @@ public class UserService {
         address.setCity(addressChanged.getCity());
         address.setState(addressChanged.getState());
         address.setZipCode(addressChanged.getZipCode());
-        address.setLatitude(addressChanged.getLatitude());
-        address.setLongitude(addressChanged.getLongitude());
+        CoordinatesDTO coords = geoLocationService.getCoordinates(address);
+        address.setLatitude(
+                Double.valueOf(coords.getLat()));
+        address.setLongitude(
+                Double.valueOf(coords.getLon()));
         address.setSupplement(addressChanged.getSupplement());
 
         return addressUserRepository.save(address);
