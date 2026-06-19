@@ -4,7 +4,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -34,10 +33,13 @@ public class GeoLocationService {
         try {
 
             String query = String.format(
-                    "%s, %s, %s, Brasil",
-                    address.getStreet() + " " + address.getNumber(),
+                    "%s, %s, %s, %s, %s, %s, Brasil",
+                    address.getStreet(),
+                    address.getNumber(),
+                    address.getNeighborhood(),
                     address.getCity(),
-                    address.getState());
+                    address.getState(),
+                    address.getZipCode());
 
             String requestUrl = url +
                     "?text=" + URLEncoder.encode(query, StandardCharsets.UTF_8) +
@@ -48,6 +50,8 @@ public class GeoLocationService {
             String response = restTemplate.getForObject(requestUrl, String.class);
 
             System.out.println("RESPOSTA GEO: " + response);
+
+            System.out.println("QUERY GEOAPIFY: " + query);
 
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(response);
