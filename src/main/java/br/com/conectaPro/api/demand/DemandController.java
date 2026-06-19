@@ -5,7 +5,6 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import org.springframework.http.MediaType;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +42,7 @@ import jakarta.validation.Valid;
 @CrossOrigin
 @Tag(name = "Demand", description = "Demandas/serviços abertos pelo user do tipo cliente")
 public class DemandController {
+
     @Autowired
     private DemandService demandService;
 
@@ -58,11 +58,7 @@ public class DemandController {
             @Valid @ModelAttribute DemandRequest request,
             @RequestParam(value = "imagem", required = false) MultipartFile imagem) {
 
-        // TODO: Futuramente, mover essas validações para um @RestControllerAdvice
-        // usando exceptions customizadas (ex: EntityNotFoundException).
-
         try {
-            // As buscas com validação. Se não existir, caem no catch e retornamos 404.
             User client = userService.getById(request.getClientId());
             User professional = userService.getById(request.getProfessionalId());
             Category category = categoryService.getById(request.getCategoryId());
@@ -74,25 +70,21 @@ public class DemandController {
             demandNew.setClientId(client);
             demandNew.setProfessionalId(professional);
             demandNew.setDemandStatus(DemandStatus.ABERTO);
+
             String demandCode = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
             demandNew.setCode(demandCode);
+
             if (imagem != null && !imagem.isEmpty()) {
-
                 String nomeArquivo = Util.fazerUploadImagem(imagem);
-
                 if (nomeArquivo == null) {
                     throw new RuntimeException("Erro ao salvar imagem");
                 }
-
                 demandNew.setImgUrl(nomeArquivo);
             }
 
             Demand demand = demandService.save(demandNew);
             return new ResponseEntity<>(demand, HttpStatus.CREATED);
-
         } catch (NoSuchElementException e) {
-            // Captura o erro do .get() dos services e devolve 400 Bad Request ou 404 Not
-            // Found
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Um dos IDs informados (Cliente, Profissional, Categoria ou Endereço) não existe.");
         }
@@ -134,19 +126,16 @@ public class DemandController {
             demand.setCategoryId(
                     categoryService.getById(request.getCategoryId()));
         }
-
         if (request.getProfessionalId() != null) {
             demand.setProfessionalId(
                     userService.getById(request.getProfessionalId()));
         }
-
         if (request.getAddressId() != null) {
             demand.setAddressId(
                     userService.getAddressById(request.getAddressId()));
         }
 
         demandService.update(id, demand);
-
         return ResponseEntity.ok().build();
     }
 
@@ -155,9 +144,9 @@ public class DemandController {
     public ResponseEntity<Demand> reassignProfessional(
             @PathVariable @NonNull Long id,
             @RequestBody ReassignRequestDTO request) {
+
         Demand updatedDemand = demandService.reassign(id, request.professionalId());
         return ResponseEntity.ok(updatedDemand);
-
     }
 
     @Operation(summary = "Atualiza o status da demanda")
@@ -165,6 +154,7 @@ public class DemandController {
     public ResponseEntity<Demand> updateStatus(
             @PathVariable Long id,
             @RequestBody StatusUpdateDTO request) {
+
         Demand updated = demandService.updateStatus(id, request.getStatus());
         return ResponseEntity.ok(updated);
     }
@@ -172,9 +162,7 @@ public class DemandController {
     @Operation(summary = "Deleta uma demanda")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable @NonNull Long id) {
-
         demandService.delete(id);
         return ResponseEntity.ok().build();
     }
-
 }

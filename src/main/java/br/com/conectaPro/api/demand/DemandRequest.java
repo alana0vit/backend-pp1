@@ -22,11 +22,9 @@ public class DemandRequest {
     @Length(max = 50)
     private String code;
 
-    @NotBlank()
     @Length(max = 100, message = "O título deverá ter no máximo {max} caracteres")
     private String title;
 
-    @NotBlank()
     @Length(max = 500, message = "A descrição deverá ter no máximo {max} caracteres")
     private String description;
 
@@ -34,18 +32,14 @@ public class DemandRequest {
 
     private LocalDate suggestedDate;
 
-    @NotNull()
     private Long addressId;
 
-    @NotNull()
     private Long categoryId;
 
-    @NotNull()
     private Long clientId;
 
     private DemandStatus demandStatus;
 
-    @NotNull
     private Long professionalId;
 
     public Demand build() {

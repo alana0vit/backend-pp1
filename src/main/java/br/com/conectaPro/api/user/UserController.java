@@ -74,12 +74,14 @@ public class UserController {
     public ResponseEntity<List<UserResponseDTO>> search(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Long categoryId,
-            @RequestParam(required = false) Long addressId,
+            @RequestParam(required = false) Double latitude,
+            @RequestParam(required = false) Double longitude,
             @RequestParam(required = false) Double radiusKm) {
         List<User> users = userService.search(
                 name,
                 categoryId,
-                addressId,
+                latitude,
+                longitude,
                 radiusKm);
         List<UserResponseDTO> response = users.stream()
                 .map(UserResponseDTO::fromEntity)

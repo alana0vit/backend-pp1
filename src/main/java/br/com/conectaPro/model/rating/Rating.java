@@ -1,16 +1,10 @@
 package br.com.conectaPro.model.rating;
 
 import org.hibernate.annotations.SQLRestriction;
-
 import br.com.conectaPro.model.demand.Demand;
 import br.com.conectaPro.model.user.User;
 import br.com.conectaPro.util.entity.AudibleEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,22 +21,25 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Rating extends AudibleEntity {
 
-    @ManyToOne()
+    @ManyToOne
+    @JoinColumn(name = "service_id")
     private Demand service;
 
-    @ManyToOne()
+    @ManyToOne
+    @JoinColumn(name = "evaluating_person_id")
     private User evaluatingPerson;
 
-    @ManyToOne()
+    @ManyToOne
+    @JoinColumn(name = "person_evaluated_id")
     private User personEvaluated;
 
-    @Column()
+    @Column
     private Integer points;
 
     @Column(length = 500)
     private String description;
 
-    @Column()
+    @Column
     private Boolean anonymous;
 
     @Enumerated(EnumType.STRING)

@@ -15,6 +15,7 @@ public record UserResponseDTO(
         LocalDate birthDate,
         UserType userType,
         String registryId,
+        Double rating,
         List<CategoryBasicDTO> categories) {
     // Record auxiliar para devolver apenas o necessário da Categoria
     public record CategoryBasicDTO(Long id, String name) {
@@ -35,6 +36,7 @@ public record UserResponseDTO(
                 user.getBirthDate(),
                 user.getUserType(),
                 user.getRegistryId(),
+                user.getRating(),           
                 categoryDTOs);
     }
 }

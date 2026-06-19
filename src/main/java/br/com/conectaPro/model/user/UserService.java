@@ -160,29 +160,20 @@ public class UserService {
     public List<User> search(
             String name,
             Long categoryId,
-            Long addressId,
+            Double latitude,
+            Double longitude,
             Double radiusKm) {
 
-        if (radiusKm != null && radiusKm > 20) {
-            throw new IllegalArgumentException("Distância máxima permitida alcançada");
-        }
-
-        Double lat = null;
-        Double lng = null;
-
-        if (addressId != null) {
-
-            AddressUser address = getAddressById(addressId);
-
-            lat = address.getLatitude();
-            lng = address.getLongitude();
+        if (radiusKm != null && radiusKm <= 0) {
+            throw new IllegalArgumentException(
+                    "O raio deve ser maior que zero");
         }
 
         return userRepository.searchUsers(
                 name,
                 categoryId,
-                lat,
-                lng,
+                latitude,
+                longitude,
                 radiusKm);
     }
 
