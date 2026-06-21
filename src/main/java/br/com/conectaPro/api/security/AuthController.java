@@ -1,10 +1,11 @@
 package br.com.conectaPro.api.security;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,13 +18,11 @@ import br.com.conectaPro.dto.ResetPasswordDTO;
 import br.com.conectaPro.model.user.User;
 import br.com.conectaPro.model.user.UserRepository;
 import br.com.conectaPro.security.CustomUserDetails;
+import br.com.conectaPro.security.EmailService;
 import br.com.conectaPro.security.JwtService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/auth")
@@ -33,6 +32,7 @@ public class AuthController {
 
     private final UserRepository userRepository;
     private final JwtService jwtService;
+    private final EmailService emailService;
 
     @Operation(summary = "Faz login no sistema")
     @PostMapping("/login")
@@ -67,7 +67,12 @@ public class AuthController {
         user.setRecoveryToken(token);
         user.setRecoveryTokenExpiration(LocalDateTime.now().plusMinutes(30));
         userRepository.save(user);
-        return ResponseEntity.ok(token);
+        emailService.sendRecoveryEmail(
+                user.getEmail(),
+                token);
+
+        return ResponseEntity.ok(
+                "E-mail de recuperação enviado.");
     }
 
     @Operation(summary = "Redefine a senha")
