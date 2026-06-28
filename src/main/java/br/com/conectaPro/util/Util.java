@@ -5,10 +5,19 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.time.LocalDateTime;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+@Component
 public class Util {
-    public static final String LOCAL_ARMAZENAMENTO_IMAGENS = "C:\\Users\\dope0\\OneDrive - MSFT\\Pictures\\testeIMG\\";
+
+    private static String diretorioImagens;
+
+    @Value("${app.imagens.diretorio}")
+    public void setDiretorioImagens(String diretorio) {
+        Util.diretorioImagens = diretorio;
+    }
 
     public static String fazerUploadImagem(MultipartFile imagem) {
 
@@ -17,49 +26,42 @@ public class Util {
 
         if (imagem != null && !imagem.isEmpty()) {
 
-            String dataHora = LocalDateTime.now().getYear() + "-"
-                    + LocalDateTime.now().getMonthValue() + "-"
-                    + LocalDateTime.now().getDayOfMonth() + "-"
-                    + LocalDateTime.now().getHour() + "-"
-                    + LocalDateTime.now().getMinute() + "-"
-                    + LocalDateTime.now().getSecond() + " - ";
+            LocalDateTime agora = LocalDateTime.now();
+            String dataHora = agora.getYear() + "-"
+                    + agora.getMonthValue() + "-"
+                    + agora.getDayOfMonth() + "-"
+                    + agora.getHour() + "-"
+                    + agora.getMinute() + "-"
+                    + agora.getSecond() + " - ";
 
             String nomeOriginalArquivo = imagem.getOriginalFilename();
             nomeArquivoComDataHora = dataHora + nomeOriginalArquivo;
-            try {
 
-                // Criando o diretório para armazenar o arquivo
-                String imagens_projetos = LOCAL_ARMAZENAMENTO_IMAGENS + "/imagens_cadastradas";
-                File dir = new File(imagens_projetos);
+            try {
+                String pastaDestino = diretorioImagens + File.separator + "imagens_cadastradas";
+                File dir = new File(pastaDestino);
 
                 if (!dir.exists()) {
                     dir.mkdirs();
                 }
 
-                // Criando o arquivo no diretório
                 File serverFile = new File(dir.getAbsolutePath() + File.separator + nomeArquivoComDataHora);
-                BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
-                stream.write(imagem.getBytes());
-                stream.close();
+                try (BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile))) {
+                    stream.write(imagem.getBytes());
+                }
 
-                System.out.println("Arquivo armazenado em:" + serverFile.getAbsolutePath());
-                System.out.println("Você fez o upload do arquivo " + nomeOriginalArquivo + " com sucesso");
+                System.out.println("Arquivo armazenado em: " + serverFile.getAbsolutePath());
+                System.out.println("Upload do arquivo '" + nomeOriginalArquivo + "' realizado com sucesso.");
                 sucessoUpload = true;
 
             } catch (Exception e) {
-                System.out
-                        .println("Você falhou em carregar o arquivo " + nomeOriginalArquivo + " => " + e.getMessage());
+                System.out.println("Falha ao carregar o arquivo '" + nomeOriginalArquivo + "': " + e.getMessage());
             }
 
         } else {
-            System.out.println("Você falhou em carregar o arquivo porque ele está vazio ");
+            System.out.println("Arquivo vazio ou nulo, upload ignorado.");
         }
 
-        if (sucessoUpload) {
-            return nomeArquivoComDataHora;
-        } else {
-            return null;
-        }
+        return sucessoUpload ? nomeArquivoComDataHora : null;
     }
-
 }
