@@ -3,6 +3,7 @@ package br.com.conectaPro.model.user;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import br.com.conectaPro.api.user.UserRequest;
@@ -16,31 +17,35 @@ import jakarta.transaction.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
-
     private final AddressUserRepository addressUserRepository;
-
     private final CategoryRepository categoryRepository;
-
     private final GeoLocationService geoLocationService;
+    private final PasswordEncoder passwordEncoder;
 
     public UserService(
             UserRepository repository,
             AddressUserRepository addressUserRepository,
             CategoryRepository categoryRepository,
-            GeoLocationService geoLocationService) {
+            GeoLocationService geoLocationService,
+            PasswordEncoder passwordEncoder) {
 
         this.userRepository = repository;
         this.addressUserRepository = addressUserRepository;
         this.categoryRepository = categoryRepository;
         this.geoLocationService = geoLocationService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
     public User save(UserRequest userRequest) {
         validateProfessionalCategories(userRequest.getUserType(), userRequest.getCategoriesIds());
 
-        // Instancia e salva o User
         User user = userRequest.build();
+
+        user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+
+        user.setRating(0.0);
+
         if (userRequest.getCategoriesIds() != null && !userRequest.getCategoriesIds().isEmpty()) {
             List<Category> categories = categoryRepository.findAllById(userRequest.getCategoriesIds());
             user.setCategories(categories);
@@ -52,33 +57,19 @@ public class UserService {
         // Instancia e salva o Address vinculado ao User
         AddressUser addressUser = userRequest.getAddress().build();
         try {
-
             CoordinatesDTO coords = geoLocationService.getCoordinates(addressUser);
-
-            addressUser.setLatitude(
-                    Double.parseDouble(coords.getLat()));
-
-            addressUser.setLongitude(
-                    Double.parseDouble(coords.getLon()));
-
-            System.out.println(
-                    "LAT: " + addressUser.getLatitude());
-
-            System.out.println(
-                    "LNG: " + addressUser.getLongitude());
-
+            addressUser.setLatitude(Double.parseDouble(coords.getLat()));
+            addressUser.setLongitude(Double.parseDouble(coords.getLon()));
+            System.out.println("LAT: " + addressUser.getLatitude());
+            System.out.println("LNG: " + addressUser.getLongitude());
         } catch (Exception e) {
-
-            System.out.println(
-                    "ERRO GEOLOCALIZACAO: "
-                            + e.getMessage());
-
+            System.out.println("ERRO GEOLOCALIZACAO: " + e.getMessage());
         }
+
         addressUser.setUserId(savedUser);
         addressUser.setEnabled(Boolean.TRUE);
         addressUserRepository.save(addressUser);
 
-        // Atualiza a lista no objeto (para retornos imediatos, se necessário)
         List<AddressUser> addresses = new ArrayList<>();
         addresses.add(addressUser);
         savedUser.setAdresses(addresses);
@@ -88,9 +79,6 @@ public class UserService {
 
     private void validateProfessionalCategories(UserType userType, List<Long> categoryIds) {
         if (UserType.CLIENT.equals(userType) && categoryIds != null && !categoryIds.isEmpty()) {
-            // Vou jogar uma exceção aqui, talvez precise reformuçar a maneira de lidar com
-            // erros
-            // Pode ser pega pelo controller e soltar um 400 (Bad Request)
             throw new IllegalArgumentException(
                     "Erro de negócio: Clientes não podem possuir categorias profissionais vinculadas.");
         }
@@ -106,39 +94,33 @@ public class UserService {
     }
 
     public User getById(Long id) {
-        return userRepository.findById(id).get();
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado com o ID: " + id));
     }
 
     @Transactional
-    public void update(Long id, User userChanged, List<Long> categoryIds) {
+    public void update(Long id, UserRequest userRequest) {
 
-        User user = userRepository.findById(id).get(); // Talvez add um orElseThrow()
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado com o ID: " + id));
 
-        validateProfessionalCategories(userChanged.getUserType(), categoryIds);
+        validateProfessionalCategories(userRequest.getUserType(), userRequest.getCategoriesIds());
 
-        user.setName(userChanged.getName());
-        user.setEnterprise(userChanged.getEnterprise());
-        user.setEmail(userChanged.getEmail());
-        user.setBirthDate(userChanged.getBirthDate());
-        user.setPhone(userChanged.getPhone());
-        user.setRating(userChanged.getRating());
-        user.setUserType(userChanged.getUserType());
-        user.setRegistryId(userChanged.getRegistryId());
-        user.setPhoto(userChanged.getPhoto());
+        user.setName(userRequest.getName());
+        user.setEnterprise(userRequest.getEnterprise());
+        user.setEmail(userRequest.getEmail());
+        user.setBirthDate(userRequest.getBirthDate());
+        user.setPhone(userRequest.getPhone());
+        user.setUserType(userRequest.getUserType());
+        user.setRegistryId(userRequest.getRegistryId());
+        user.setPhoto(userRequest.getPhoto());
 
-        if (userChanged.getPassword() != null && !userChanged.getPassword().isBlank()) {
-            user.setPassword(userChanged.getPassword());
+        if (userRequest.getPassword() != null && !userRequest.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
         }
 
-        if (userChanged.getAdresses() != null) {
-            user.getAdresses().clear();
-            // Garante a integridade da Foreign Key (Essencial!)
-            userChanged.getAdresses().forEach(address -> address.setUserId(user));
-            user.getAdresses().addAll(userChanged.getAdresses());
-        }
-
-        if (categoryIds != null) {
-            List<Category> categories = categoryRepository.findAllById(categoryIds);
+        if (userRequest.getCategoriesIds() != null) {
+            List<Category> categories = categoryRepository.findAllById(userRequest.getCategoriesIds());
             user.setCategories(categories);
         } else {
             user.setCategories(new ArrayList<>());
@@ -149,14 +131,11 @@ public class UserService {
 
     @Transactional
     public void delete(Long id) {
-
-        User user = userRepository.findById(id).get();
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado com o ID: " + id));
         user.setEnabled(Boolean.FALSE);
-
         userRepository.save(user);
     }
-
-    // Filtros de busca para user do tipo "PROFESSIONAL"
 
     public List<User> search(
             String name,
@@ -166,16 +145,10 @@ public class UserService {
             Double radiusKm) {
 
         if (radiusKm != null && radiusKm <= 0) {
-            throw new IllegalArgumentException(
-                    "O raio deve ser maior que zero");
+            throw new IllegalArgumentException("O raio deve ser maior que zero");
         }
 
-        return userRepository.searchUsers(
-                name,
-                categoryId,
-                latitude,
-                longitude,
-                radiusKm);
+        return userRepository.searchUsers(name, categoryId, latitude, longitude, radiusKm);
     }
 
     // Endereços
@@ -191,45 +164,27 @@ public class UserService {
     }
 
     @Transactional
-    public AddressUser postAddressUser(
-            Long userId,
-            AddressUser address) {
-
+    public AddressUser postAddressUser(Long userId, AddressUser address) {
         User user = this.getById(userId);
 
         try {
-
             CoordinatesDTO coords = geoLocationService.getCoordinates(address);
-
-            address.setLatitude(
-                    Double.parseDouble(coords.getLat()));
-
-            address.setLongitude(
-                    Double.parseDouble(coords.getLon()));
-
+            address.setLatitude(Double.parseDouble(coords.getLat()));
+            address.setLongitude(Double.parseDouble(coords.getLon()));
         } catch (Exception e) {
-
-            System.out.println(
-                    "ERRO GEOLOCALIZACAO: "
-                            + e.getMessage());
-
+            System.out.println("ERRO GEOLOCALIZACAO: " + e.getMessage());
         }
 
         address.setUserId(user);
         address.setEnabled(Boolean.TRUE);
-
         addressUserRepository.save(address);
 
         List<AddressUser> listAddressUser = user.getAdresses();
-
         if (listAddressUser == null) {
             listAddressUser = new ArrayList<>();
         }
-
         listAddressUser.add(address);
-
         user.setAdresses(listAddressUser);
-
         userRepository.save(user);
 
         return address;
@@ -237,28 +192,29 @@ public class UserService {
 
     @Transactional
     public AddressUser updateAddressUser(Long id, AddressUser addressChanged) {
+        AddressUser address = addressUserRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Endereço não encontrado com o ID: " + id));
 
-        AddressUser address = addressUserRepository.findById(id).get();
         address.setStreet(addressChanged.getStreet());
         address.setNumber(addressChanged.getNumber());
         address.setNeighborhood(addressChanged.getNeighborhood());
         address.setCity(addressChanged.getCity());
         address.setState(addressChanged.getState());
         address.setZipCode(addressChanged.getZipCode());
-        CoordinatesDTO coords = geoLocationService.getCoordinates(address);
-        address.setLatitude(
-                Double.valueOf(coords.getLat()));
-        address.setLongitude(
-                Double.valueOf(coords.getLon()));
         address.setSupplement(addressChanged.getSupplement());
+
+        CoordinatesDTO coords = geoLocationService.getCoordinates(address);
+        address.setLatitude(Double.valueOf(coords.getLat()));
+        address.setLongitude(Double.valueOf(coords.getLon()));
 
         return addressUserRepository.save(address);
     }
 
     @Transactional
     public void deleteAddressUser(Long idAddress) {
+        AddressUser address = addressUserRepository.findById(idAddress)
+                .orElseThrow(() -> new RuntimeException("Endereço não encontrado com o ID: " + idAddress));
 
-        AddressUser address = addressUserRepository.findById(idAddress).get();
         address.setEnabled(Boolean.FALSE);
         addressUserRepository.save(address);
 
@@ -266,5 +222,4 @@ public class UserService {
         user.getAdresses().remove(address);
         userRepository.save(user);
     }
-
 }

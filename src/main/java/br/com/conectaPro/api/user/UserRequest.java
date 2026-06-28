@@ -40,7 +40,7 @@ public class UserRequest {
     private String email;
 
     @NotBlank()
-    @Size(min=6, message="A senha deve ter no mínimo 6 caracteres")
+    @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres")
     private String password;
 
     @JsonFormat(pattern = "dd/MM/yyyy")
@@ -49,12 +49,11 @@ public class UserRequest {
     private LocalDate birthDate;
 
     @NotBlank()
-    @Pattern(
-        regexp = "^\\d{10,11}$"
-    )
+    @Pattern(regexp = "^\\d{10,11}$")
     private String phone;
 
-    private Double rating;
+    // rating NÃO é informado pelo cliente — é gerenciado internamente
+    // (removido do request para evitar manipulação externa)
 
     @NotNull()
     private UserType userType;
@@ -68,21 +67,18 @@ public class UserRequest {
     @Valid
     private AddressUserRequest address;
 
-    private List<Long> categoriesIds; 
+    private List<Long> categoriesIds;
 
     public User build() {
-
         return User.builder()
                 .name(name)
                 .enterprise(enterprise)
                 .email(email)
-                .password(password)
                 .birthDate(birthDate)
                 .phone(phone)
-                .rating(rating)
                 .userType(userType)
                 .registryId(registryId)
+                .photo(photo)
                 .build();
     }
-
 }

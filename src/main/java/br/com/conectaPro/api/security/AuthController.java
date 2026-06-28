@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +34,7 @@ public class AuthController {
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final EmailService emailService;
+    private final PasswordEncoder passwordEncoder;
 
     @Operation(summary = "Faz login no sistema")
     @PostMapping("/login")
@@ -40,8 +42,8 @@ public class AuthController {
         Optional<User> userOpt = userRepository.findByEmail(request.email());
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            boolean senhaValida = request.password().equals(user.getPassword());
-            if (senhaValida) {
+            // Verifica senha usando BCrypt
+            if (passwordEncoder.matches(request.password(), user.getPassword())) {
                 CustomUserDetails userDetails = new CustomUserDetails(user);
                 String token = jwtService.generateToken(userDetails);
 
@@ -67,12 +69,9 @@ public class AuthController {
         user.setRecoveryToken(token);
         user.setRecoveryTokenExpiration(LocalDateTime.now().plusMinutes(30));
         userRepository.save(user);
-        emailService.sendRecoveryEmail(
-                user.getEmail(),
-                token);
+        emailService.sendRecoveryEmail(user.getEmail(), token);
 
-        return ResponseEntity.ok(
-                "E-mail de recuperação enviado.");
+        return ResponseEntity.ok("E-mail de recuperação enviado.");
     }
 
     @Operation(summary = "Redefine a senha")
@@ -87,7 +86,8 @@ public class AuthController {
                 || user.getRecoveryTokenExpiration().isBefore(LocalDateTime.now())) {
             return ResponseEntity.badRequest().body("Token expirado.");
         }
-        user.setPassword(request.newPassword());
+        // Criptografa a nova senha antes de salvar
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
         user.setRecoveryToken(null);
         user.setRecoveryTokenExpiration(null);
         userRepository.save(user);

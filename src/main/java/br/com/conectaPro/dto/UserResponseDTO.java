@@ -16,12 +16,12 @@ public record UserResponseDTO(
         UserType userType,
         String registryId,
         Double rating,
+        String photo,
         List<CategoryBasicDTO> categories) {
-    // Record auxiliar para devolver apenas o necessário da Categoria
+
     public record CategoryBasicDTO(Long id, String name) {
     }
 
-    // Mapper estático para facilitar a conversão
     public static UserResponseDTO fromEntity(User user) {
         List<CategoryBasicDTO> categoryDTOs = user.getCategories() == null ? List.of()
                 : user.getCategories().stream()
@@ -36,7 +36,8 @@ public record UserResponseDTO(
                 user.getBirthDate(),
                 user.getUserType(),
                 user.getRegistryId(),
-                user.getRating(),           
+                user.getRating(),
+                user.getPhoto(),
                 categoryDTOs);
     }
 }
