@@ -1,9 +1,10 @@
 package br.com.conectaPro.model.demand;
 
-import java.time.LocalDate;
-import java.util.List;
-
 import org.hibernate.annotations.SQLRestriction;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 import br.com.conectaPro.model.category.Category;
 import br.com.conectaPro.model.user.AddressUser;
@@ -55,6 +56,9 @@ public class Demand extends AudibleEntity {
     @Column
     private LocalDate suggestedDate;
 
+    @Column
+    private LocalDateTime openedAt;
+
     @ManyToOne
     private AddressUser addressId;
 
@@ -69,5 +73,4 @@ public class Demand extends AudibleEntity {
 
     @Enumerated(EnumType.STRING)
     private DemandStatus demandStatus;
-
 }
