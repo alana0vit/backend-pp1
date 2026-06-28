@@ -41,8 +41,12 @@ public class UserController {
 
     @Operation(summary = "Lista todos os usuarios")
     @GetMapping
-    public List<User> getAll() {
-        return userService.getAll();
+    public ResponseEntity<List<UserResponseDTO>> getAll() {
+        List<UserResponseDTO> response = userService.getAll()
+                .stream()
+                .map(UserResponseDTO::fromEntity)
+                .toList();
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Lista um usuario especifico pelo seu ID")
