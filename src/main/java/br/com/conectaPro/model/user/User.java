@@ -6,12 +6,12 @@ import java.util.List;
 
 import org.hibernate.annotations.SQLRestriction;
 
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.EnumType;
 import br.com.conectaPro.model.category.Category;
 import br.com.conectaPro.util.entity.AudibleEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -60,6 +60,9 @@ public class User extends AudibleEntity {
 
     @Column
     private String registryId;
+
+    @Column
+    private String photo;
 
     @Column
     private String recoveryToken;

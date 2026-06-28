@@ -124,8 +124,9 @@ public class UserService {
         user.setRating(userChanged.getRating());
         user.setUserType(userChanged.getUserType());
         user.setRegistryId(userChanged.getRegistryId());
+        user.setPhoto(userChanged.getPhoto());
 
-        if (userChanged.getPassword() != null && userChanged.getPassword().isBlank()) {
+        if (userChanged.getPassword() != null && !userChanged.getPassword().isBlank()) {
             user.setPassword(userChanged.getPassword());
         }
 

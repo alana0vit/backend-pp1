@@ -1,13 +1,12 @@
 package br.com.conectaPro.api.demand;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 import org.hibernate.validator.constraints.Length;
 
 import br.com.conectaPro.model.demand.Demand;
 import br.com.conectaPro.model.demand.DemandStatus;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -43,7 +42,6 @@ public class DemandRequest {
     private Long professionalId;
 
     public Demand build() {
-
         return Demand.builder()
                 .code(code)
                 .title(title)
@@ -51,6 +49,7 @@ public class DemandRequest {
                 .suggestedValue(suggestedValue)
                 .suggestedDate(suggestedDate)
                 .demandStatus(demandStatus)
+                .imgUrl(new ArrayList<>())
                 .build();
     }
 }

@@ -62,6 +62,8 @@ public class UserRequest {
     @NotBlank()
     private String registryId;
 
+    private String photo;
+
     @NotNull(message = "O endereço é obrigatório")
     @Valid
     private AddressUserRequest address;

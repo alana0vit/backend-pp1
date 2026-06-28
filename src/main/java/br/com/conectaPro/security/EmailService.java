@@ -1,12 +1,12 @@
 package br.com.conectaPro.security;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 
 @Service
 @RequiredArgsConstructor
@@ -21,29 +21,52 @@ public class EmailService {
             String to,
             String token) {
 
-        String link =
-            "http://localhost:5173/reset-password?token="
-                + token;
+        try {
 
-        SimpleMailMessage message =
-            new SimpleMailMessage();
+            String link =
+                    "http://localhost:5173/reset-password?token="
+                            + token;
 
-        message.setFrom(from);
-        message.setTo(to);
-        message.setSubject("Recuperação de senha");
+            MimeMessage message =
+                    mailSender.createMimeMessage();
 
-        message.setText(
-                """
-                Você solicitou recuperação de senha.
+            MimeMessageHelper helper =
+                    new MimeMessageHelper(
+                            message,
+                            true,
+                            "UTF-8");
 
-                Clique no link abaixo:
+            helper.setFrom(
+                    from,
+                    "ConectaPro");
 
-                %s
+            helper.setTo(to);
 
-                O link expira em 30 minutos.
-                """
-                        .formatted(link));
+            helper.setSubject(
+                    "Recuperação de senha - ConectaPro");
 
-        mailSender.send(message);
+            helper.setText(
+                    """
+                    Você solicitou recuperação de senha.
+
+                    Clique no link abaixo:
+
+                    %s
+
+                    O link expira em 30 minutos.
+
+                    Caso não tenha solicitado esta alteração,
+                    ignore este e-mail.
+                    """
+                            .formatted(link));
+
+            mailSender.send(message);
+
+        } catch (Exception e) {
+
+            throw new RuntimeException(
+                    "Erro ao enviar e-mail",
+                    e);
+        }
     }
 }

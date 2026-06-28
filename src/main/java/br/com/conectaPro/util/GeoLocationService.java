@@ -45,13 +45,8 @@ public class GeoLocationService {
                     "?text=" + URLEncoder.encode(query, StandardCharsets.UTF_8) +
                     "&apiKey=" + apiKey;
 
-            System.out.println("URL GEO: " + requestUrl);
 
             String response = restTemplate.getForObject(requestUrl, String.class);
-
-            System.out.println("RESPOSTA GEO: " + response);
-
-            System.out.println("QUERY GEOAPIFY: " + query);
 
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(response);

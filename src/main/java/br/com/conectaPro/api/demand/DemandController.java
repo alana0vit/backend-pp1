@@ -1,6 +1,7 @@
 package br.com.conectaPro.api.demand;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -52,11 +53,11 @@ public class DemandController {
     @Autowired
     private UserService userService;
 
-    @Operation(summary = "Criar entidade demanda")
+     @Operation(summary = "Criar entidade demanda")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> save(
             @Valid @ModelAttribute DemandRequest request,
-            @RequestParam(value = "imagem", required = false) MultipartFile imagem) {
+            @RequestParam(value = "imagens", required = false) List<MultipartFile> imagens) {
 
         try {
             User client = userService.getById(request.getClientId());
@@ -74,12 +75,18 @@ public class DemandController {
             String demandCode = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
             demandNew.setCode(demandCode);
 
-            if (imagem != null && !imagem.isEmpty()) {
-                String nomeArquivo = Util.fazerUploadImagem(imagem);
-                if (nomeArquivo == null) {
-                    throw new RuntimeException("Erro ao salvar imagem");
+            if (imagens != null && !imagens.isEmpty()) {
+                List<String> urls = new ArrayList<>();
+                for (MultipartFile imagem : imagens) {
+                    if (imagem != null && !imagem.isEmpty()) {
+                        String nomeArquivo = Util.fazerUploadImagem(imagem);
+                        if (nomeArquivo == null) {
+                            throw new RuntimeException("Erro ao salvar imagem: " + imagem.getOriginalFilename());
+                        }
+                        urls.add(nomeArquivo);
+                    }
                 }
-                demandNew.setImgUrl(nomeArquivo);
+                demandNew.setImgUrl(urls);
             }
 
             Demand demand = demandService.save(demandNew);
@@ -90,13 +97,13 @@ public class DemandController {
         }
     }
 
-    @Operation(summary = "Lista todas as demandas de um cliente")
+    @Operation(summary = "Lista todas as demandas")
     @GetMapping("/user")
     public List<Demand> getAll() {
         return demandService.getAll();
     }
 
-    @Operation(summary = "Lista uma demanda especifica de um cliente")
+    @Operation(summary = "Lista uma demanda especifica pelo ID")
     @GetMapping("/user/{id}")
     public Demand getById(@PathVariable @NonNull Long id) {
         return demandService.getById(id);
@@ -107,32 +114,32 @@ public class DemandController {
     public ResponseEntity<Void> update(
             @PathVariable Long id,
             @ModelAttribute DemandRequest request,
-            @RequestParam(value = "imagem", required = false) MultipartFile imagem) {
+            @RequestParam(value = "imagens", required = false) List<MultipartFile> imagens) {
 
         Demand demand = request.build();
 
-        if (imagem != null && !imagem.isEmpty()) {
-
-            String nomeArquivo = Util.fazerUploadImagem(imagem);
-
-            if (nomeArquivo == null) {
-                throw new RuntimeException("Erro ao salvar imagem");
+        if (imagens != null && !imagens.isEmpty()) {
+            List<String> urls = new ArrayList<>();
+            for (MultipartFile imagem : imagens) {
+                if (imagem != null && !imagem.isEmpty()) {
+                    String nomeArquivo = Util.fazerUploadImagem(imagem);
+                    if (nomeArquivo == null) {
+                        throw new RuntimeException("Erro ao salvar imagem: " + imagem.getOriginalFilename());
+                    }
+                    urls.add(nomeArquivo);
+                }
             }
-
-            demand.setImgUrl(nomeArquivo);
+            demand.setImgUrl(urls);
         }
 
         if (request.getCategoryId() != null) {
-            demand.setCategoryId(
-                    categoryService.getById(request.getCategoryId()));
+            demand.setCategoryId(categoryService.getById(request.getCategoryId()));
         }
         if (request.getProfessionalId() != null) {
-            demand.setProfessionalId(
-                    userService.getById(request.getProfessionalId()));
+            demand.setProfessionalId(userService.getById(request.getProfessionalId()));
         }
         if (request.getAddressId() != null) {
-            demand.setAddressId(
-                    userService.getAddressById(request.getAddressId()));
+            demand.setAddressId(userService.getAddressById(request.getAddressId()));
         }
 
         demandService.update(id, demand);
