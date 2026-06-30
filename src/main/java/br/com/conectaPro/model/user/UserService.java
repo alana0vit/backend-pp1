@@ -44,8 +44,6 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
 
-        user.setRating(0.0);
-
         if (userRequest.getCategoriesIds() != null && !userRequest.getCategoriesIds().isEmpty()) {
             List<Category> categories = categoryRepository.findAllById(userRequest.getCategoriesIds());
             user.setCategories(categories);
