@@ -5,12 +5,14 @@ import java.util.List;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import br.com.conectaPro.api.user.UserRequest;
 import br.com.conectaPro.dto.CoordinatesDTO;
 import br.com.conectaPro.model.category.Category;
 import br.com.conectaPro.model.category.CategoryRepository;
 import br.com.conectaPro.util.GeoLocationService;
+import br.com.conectaPro.util.Util;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -133,6 +135,41 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado com o ID: " + id));
         user.setEnabled(Boolean.FALSE);
         userRepository.save(user);
+    }
+
+    @Transactional
+    public User updatePhoto(Long id, MultipartFile foto) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado com o ID: " + id));
+
+        String nomeArquivo = Util.fazerUploadImagem(foto);
+        if (nomeArquivo == null) {
+            throw new RuntimeException("Erro ao salvar a foto: " + foto.getOriginalFilename());
+        }
+
+        String fotoAntiga = user.getPhoto();
+        user.setPhoto(nomeArquivo);
+        User saved = userRepository.save(user);
+
+        // Só apaga a foto antiga depois de garantir que a nova já foi salva
+        if (fotoAntiga != null && !fotoAntiga.isBlank()) {
+            Util.apagarImagem(fotoAntiga);
+        }
+
+        return saved;
+    }
+
+    @Transactional
+    public User deletePhoto(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado com o ID: " + id));
+
+        if (user.getPhoto() != null && !user.getPhoto().isBlank()) {
+            Util.apagarImagem(user.getPhoto());
+        }
+
+        user.setPhoto(null);
+        return userRepository.save(user);
     }
 
     public List<User> search(

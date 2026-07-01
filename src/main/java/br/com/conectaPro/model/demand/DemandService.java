@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import br.com.conectaPro.model.user.User;
 import br.com.conectaPro.model.user.UserService;
 import br.com.conectaPro.security.EmailService;
+import br.com.conectaPro.util.Util;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -161,6 +162,20 @@ public class DemandService {
         }
 
         return saved;
+    }
+
+    @Transactional
+    public Demand removeImage(@NonNull Long id, @NonNull String nomeArquivo) {
+        Demand demand = repository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Demanda não encontrada com ID: " + id));
+
+        if (demand.getImgUrl() == null || !demand.getImgUrl().remove(nomeArquivo)) {
+            throw new NoSuchElementException("Imagem não encontrada nesta demanda: " + nomeArquivo);
+        }
+
+        Util.apagarImagem(nomeArquivo);
+
+        return repository.save(demand);
     }
 
     @Transactional

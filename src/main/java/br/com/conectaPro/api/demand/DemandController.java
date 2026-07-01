@@ -75,8 +75,8 @@ public class DemandController {
             String demandCode = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
             demandNew.setCode(demandCode);
 
+            List<String> urls = new ArrayList<>();
             if (imagens != null && !imagens.isEmpty()) {
-                List<String> urls = new ArrayList<>();
                 for (MultipartFile imagem : imagens) {
                     if (imagem != null && !imagem.isEmpty()) {
                         String nomeArquivo = Util.fazerUploadImagem(imagem);
@@ -86,8 +86,8 @@ public class DemandController {
                         urls.add(nomeArquivo);
                     }
                 }
-                demandNew.setImgUrl(urls);
             }
+            demandNew.setImgUrl(urls);
 
             Demand demand = demandService.save(demandNew);
             return new ResponseEntity<>(demand, HttpStatus.CREATED);
@@ -130,6 +130,13 @@ public class DemandController {
                 }
             }
             demand.setImgUrl(urls);
+
+            Demand demandAtual = demandService.getById(id);
+            if (demandAtual.getImgUrl() != null) {
+                for (String nomeAntigo : demandAtual.getImgUrl()) {
+                    Util.apagarImagem(nomeAntigo);
+                }
+            }
         }
 
         if (request.getCategoryId() != null) {
@@ -164,6 +171,20 @@ public class DemandController {
 
         Demand updated = demandService.updateStatus(id, request.getStatus());
         return ResponseEntity.ok(updated);
+    }
+
+    @Operation(summary = "Remove uma imagem especifica de uma demanda")
+    @DeleteMapping("/{id}/images/{nomeArquivo}")
+    public ResponseEntity<?> deleteImage(
+            @PathVariable Long id,
+            @PathVariable String nomeArquivo) {
+
+        try {
+            Demand updated = demandService.removeImage(id, nomeArquivo);
+            return ResponseEntity.ok(updated);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
     @Operation(summary = "Deleta uma demanda")

@@ -41,6 +41,7 @@ public class SecurityConfig {
             .requestMatchers("/auth/**").permitAll()
             .requestMatchers("/api/user").permitAll() // POST criar usuário
             .requestMatchers(HttpMethod.GET, "/api/category", "/api/category/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/images/**").permitAll() // servir imagens (foto do usuário / imagens da demanda)
             .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/api-docs/**").permitAll()
             .anyRequest().authenticated())
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

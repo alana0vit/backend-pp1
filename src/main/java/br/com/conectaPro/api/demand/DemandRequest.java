@@ -1,7 +1,6 @@
 package br.com.conectaPro.api.demand;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 
 import org.hibernate.validator.constraints.Length;
 
@@ -49,7 +48,6 @@ public class DemandRequest {
                 .suggestedValue(suggestedValue)
                 .suggestedDate(suggestedDate)
                 .demandStatus(demandStatus)
-                .imgUrl(new ArrayList<>())
                 .build();
     }
 }
