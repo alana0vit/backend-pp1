@@ -3,11 +3,8 @@ package br.com.conectaPro.api.image;
 import br.com.conectaPro.util.Util;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +13,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import software.amazon.awssdk.core.ResponseInputStream;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
 @RestController
 @RequestMapping("/api/images")
@@ -28,28 +27,23 @@ public class ImageController {
   @Operation(summary = "Recupera (baixa/exibe) uma imagem previamente enviada")
   @GetMapping("/{nomeArquivo}")
   public ResponseEntity<Resource> getImagem(@PathVariable String nomeArquivo) {
-    Path caminho = Util.resolverCaminhoImagem(nomeArquivo);
+    ResponseInputStream<GetObjectResponse> objeto = Util.baixarImagem(nomeArquivo);
 
-    if (caminho == null || !Files.exists(caminho) || !Files.isReadable(caminho)) {
+    if (objeto == null) {
       return ResponseEntity.notFound().build();
     }
 
-    try {
-      Resource recurso = new UrlResource(caminho.toUri());
+    String contentType = objeto.response().contentType();
+    MediaType mediaType =
+        contentType != null
+            ? MediaType.parseMediaType(contentType)
+            : MediaType.APPLICATION_OCTET_STREAM;
 
-      String contentType = Files.probeContentType(caminho);
-      MediaType mediaType =
-          contentType != null
-              ? MediaType.parseMediaType(contentType)
-              : MediaType.APPLICATION_OCTET_STREAM;
+    Resource recurso = new InputStreamResource(objeto);
 
-      return ResponseEntity.ok()
-          .contentType(mediaType)
-          .header(HttpHeaders.CACHE_CONTROL, "public, max-age=31536000, immutable")
-          .body(recurso);
-
-    } catch (IOException e) {
-      return ResponseEntity.internalServerError().build();
-    }
+    return ResponseEntity.ok()
+        .contentType(mediaType)
+        .header(HttpHeaders.CACHE_CONTROL, "public, max-age=31536000, immutable")
+        .body(recurso);
   }
 }

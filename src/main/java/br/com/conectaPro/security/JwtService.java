@@ -14,8 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class JwtService {
 
-  @Value(
-      "${jwt.secret:defaultSecretKeyThatIsVeryLongAndSecureForHS256Algorithm}") // Add a key depois
+  @Value("${jwt.secret}")
   private String secretKey;
 
   @Value("${jwt.expiration:86400000}") // Um dia por padrão
