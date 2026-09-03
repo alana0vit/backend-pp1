@@ -7,11 +7,11 @@ import lombok.Setter;
 @Setter
 public class FinishRatingDTO {
 
-    private Boolean approved;
+  private Boolean approved;
 
-    private Integer points;
+  private Integer points;
 
-    private String description;
+  private String description;
 
-    private Boolean anonymous;
+  private Boolean anonymous;
 }
