@@ -1,13 +1,26 @@
 package br.com.conectaPro.api.demand;
 
-import java.util.List;
+import br.com.conectaPro.dto.ReassignRequestDTO;
+import br.com.conectaPro.dto.StatusUpdateDTO;
+import br.com.conectaPro.model.category.Category;
+import br.com.conectaPro.model.category.CategoryService;
+import br.com.conectaPro.model.demand.Demand;
+import br.com.conectaPro.model.demand.DemandService;
+import br.com.conectaPro.model.demand.DemandStatus;
+import br.com.conectaPro.model.user.AddressUser;
+import br.com.conectaPro.model.user.User;
+import br.com.conectaPro.model.user.UserService;
+import br.com.conectaPro.util.Util;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-
-import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -23,174 +36,152 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import br.com.conectaPro.dto.ReassignRequestDTO;
-import br.com.conectaPro.dto.StatusUpdateDTO;
-import br.com.conectaPro.model.category.Category;
-import br.com.conectaPro.model.category.CategoryService;
-import br.com.conectaPro.model.demand.Demand;
-import br.com.conectaPro.model.demand.DemandService;
-import br.com.conectaPro.model.demand.DemandStatus;
-import br.com.conectaPro.model.user.AddressUser;
-import br.com.conectaPro.model.user.User;
-import br.com.conectaPro.model.user.UserService;
-import br.com.conectaPro.util.Util;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-
 @RestController
 @RequestMapping("/api/demand")
 @CrossOrigin
 @Tag(name = "Demand", description = "Demandas/serviços abertos pelo user do tipo cliente")
 public class DemandController {
 
-    @Autowired
-    private DemandService demandService;
+  @Autowired private DemandService demandService;
 
-    @Autowired
-    private CategoryService categoryService;
+  @Autowired private CategoryService categoryService;
 
-    @Autowired
-    private UserService userService;
+  @Autowired private UserService userService;
 
-     @Operation(summary = "Criar entidade demanda")
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> save(
-            @Valid @ModelAttribute DemandRequest request,
-            @RequestParam(value = "imagens", required = false) List<MultipartFile> imagens) {
+  @Operation(summary = "Criar entidade demanda")
+  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<?> save(
+      @Valid @ModelAttribute DemandRequest request,
+      @RequestParam(value = "imagens", required = false) List<MultipartFile> imagens) {
 
-        try {
-            User client = userService.getById(request.getClientId());
-            User professional = userService.getById(request.getProfessionalId());
-            Category category = categoryService.getById(request.getCategoryId());
-            AddressUser address = userService.getAddressById(request.getAddressId());
+    try {
+      User client = userService.getById(request.getClientId());
+      User professional = userService.getById(request.getProfessionalId());
+      Category category = categoryService.getById(request.getCategoryId());
+      AddressUser address = userService.getAddressById(request.getAddressId());
 
-            Demand demandNew = request.build();
-            demandNew.setCategoryId(category);
-            demandNew.setAddressId(address);
-            demandNew.setClientId(client);
-            demandNew.setProfessionalId(professional);
-            demandNew.setDemandStatus(DemandStatus.ABERTO);
+      Demand demandNew = request.build();
+      demandNew.setCategoryId(category);
+      demandNew.setAddressId(address);
+      demandNew.setClientId(client);
+      demandNew.setProfessionalId(professional);
+      demandNew.setDemandStatus(DemandStatus.ABERTO);
 
-            String demandCode = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-            demandNew.setCode(demandCode);
+      String demandCode = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+      demandNew.setCode(demandCode);
 
-            List<String> urls = new ArrayList<>();
-            if (imagens != null && !imagens.isEmpty()) {
-                for (MultipartFile imagem : imagens) {
-                    if (imagem != null && !imagem.isEmpty()) {
-                        String nomeArquivo = Util.fazerUploadImagem(imagem);
-                        if (nomeArquivo == null) {
-                            throw new RuntimeException("Erro ao salvar imagem: " + imagem.getOriginalFilename());
-                        }
-                        urls.add(nomeArquivo);
-                    }
-                }
+      List<String> urls = new ArrayList<>();
+      if (imagens != null && !imagens.isEmpty()) {
+        for (MultipartFile imagem : imagens) {
+          if (imagem != null && !imagem.isEmpty()) {
+            String nomeArquivo = Util.fazerUploadImagem(imagem);
+            if (nomeArquivo == null) {
+              throw new RuntimeException("Erro ao salvar imagem: " + imagem.getOriginalFilename());
             }
-            demandNew.setImgUrl(urls);
-
-            Demand demand = demandService.save(demandNew);
-            return new ResponseEntity<>(demand, HttpStatus.CREATED);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Um dos IDs informados (Cliente, Profissional, Categoria ou Endereço) não existe.");
+            urls.add(nomeArquivo);
+          }
         }
+      }
+      demandNew.setImgUrl(urls);
+
+      Demand demand = demandService.save(demandNew);
+      return new ResponseEntity<>(demand, HttpStatus.CREATED);
+    } catch (NoSuchElementException e) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+          .body("Um dos IDs informados (Cliente, Profissional, Categoria ou Endereço) não existe.");
     }
+  }
 
-    @Operation(summary = "Lista todas as demandas")
-    @GetMapping("/user")
-    public List<Demand> getAll() {
-        return demandService.getAll();
-    }
+  @Operation(summary = "Lista todas as demandas")
+  @GetMapping("/user")
+  public List<Demand> getAll() {
+    return demandService.getAll();
+  }
 
-    @Operation(summary = "Lista uma demanda especifica pelo ID")
-    @GetMapping("/user/{id}")
-    public Demand getById(@PathVariable @NonNull Long id) {
-        return demandService.getById(id);
-    }
+  @Operation(summary = "Lista uma demanda especifica pelo ID")
+  @GetMapping("/user/{id}")
+  public Demand getById(@PathVariable @NonNull Long id) {
+    return demandService.getById(id);
+  }
 
-    @Operation(summary = "Atualiza campos especificos da demanda")
-    @PatchMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> update(
-            @PathVariable Long id,
-            @ModelAttribute DemandRequest request,
-            @RequestParam(value = "imagens", required = false) List<MultipartFile> imagens) {
+  @Operation(summary = "Atualiza campos especificos da demanda")
+  @PatchMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<Void> update(
+      @PathVariable Long id,
+      @ModelAttribute DemandRequest request,
+      @RequestParam(value = "imagens", required = false) List<MultipartFile> imagens) {
 
-        Demand demand = request.build();
+    Demand demand = request.build();
 
-        if (imagens != null && !imagens.isEmpty()) {
-            List<String> urls = new ArrayList<>();
-            for (MultipartFile imagem : imagens) {
-                if (imagem != null && !imagem.isEmpty()) {
-                    String nomeArquivo = Util.fazerUploadImagem(imagem);
-                    if (nomeArquivo == null) {
-                        throw new RuntimeException("Erro ao salvar imagem: " + imagem.getOriginalFilename());
-                    }
-                    urls.add(nomeArquivo);
-                }
-            }
-            demand.setImgUrl(urls);
-
-            Demand demandAtual = demandService.getById(id);
-            if (demandAtual.getImgUrl() != null) {
-                for (String nomeAntigo : demandAtual.getImgUrl()) {
-                    Util.apagarImagem(nomeAntigo);
-                }
-            }
+    if (imagens != null && !imagens.isEmpty()) {
+      List<String> urls = new ArrayList<>();
+      for (MultipartFile imagem : imagens) {
+        if (imagem != null && !imagem.isEmpty()) {
+          String nomeArquivo = Util.fazerUploadImagem(imagem);
+          if (nomeArquivo == null) {
+            throw new RuntimeException("Erro ao salvar imagem: " + imagem.getOriginalFilename());
+          }
+          urls.add(nomeArquivo);
         }
+      }
+      demand.setImgUrl(urls);
 
-        if (request.getCategoryId() != null) {
-            demand.setCategoryId(categoryService.getById(request.getCategoryId()));
+      Demand demandAtual = demandService.getById(id);
+      if (demandAtual.getImgUrl() != null) {
+        for (String nomeAntigo : demandAtual.getImgUrl()) {
+          Util.apagarImagem(nomeAntigo);
         }
-        if (request.getProfessionalId() != null) {
-            demand.setProfessionalId(userService.getById(request.getProfessionalId()));
-        }
-        if (request.getAddressId() != null) {
-            demand.setAddressId(userService.getAddressById(request.getAddressId()));
-        }
-
-        demandService.update(id, demand);
-        return ResponseEntity.ok().build();
+      }
     }
 
-    @Operation(summary = "Permite atualizar o profissional após a demanda ser rejeitada")
-    @PatchMapping("/{id}/reassign")
-    public ResponseEntity<Demand> reassignProfessional(
-            @PathVariable @NonNull Long id,
-            @RequestBody ReassignRequestDTO request) {
-
-        Demand updatedDemand = demandService.reassign(id, request.professionalId());
-        return ResponseEntity.ok(updatedDemand);
+    if (request.getCategoryId() != null) {
+      demand.setCategoryId(categoryService.getById(request.getCategoryId()));
+    }
+    if (request.getProfessionalId() != null) {
+      demand.setProfessionalId(userService.getById(request.getProfessionalId()));
+    }
+    if (request.getAddressId() != null) {
+      demand.setAddressId(userService.getAddressById(request.getAddressId()));
     }
 
-    @Operation(summary = "Atualiza o status da demanda")
-    @PatchMapping("/{id}/status")
-    public ResponseEntity<Demand> updateStatus(
-            @PathVariable Long id,
-            @RequestBody StatusUpdateDTO request) {
+    demandService.update(id, demand);
+    return ResponseEntity.ok().build();
+  }
 
-        Demand updated = demandService.updateStatus(id, request.getStatus());
-        return ResponseEntity.ok(updated);
+  @Operation(summary = "Permite atualizar o profissional após a demanda ser rejeitada")
+  @PatchMapping("/{id}/reassign")
+  public ResponseEntity<Demand> reassignProfessional(
+      @PathVariable @NonNull Long id, @RequestBody ReassignRequestDTO request) {
+
+    Demand updatedDemand = demandService.reassign(id, request.professionalId());
+    return ResponseEntity.ok(updatedDemand);
+  }
+
+  @Operation(summary = "Atualiza o status da demanda")
+  @PatchMapping("/{id}/status")
+  public ResponseEntity<Demand> updateStatus(
+      @PathVariable Long id, @RequestBody StatusUpdateDTO request) {
+
+    Demand updated = demandService.updateStatus(id, request.getStatus());
+    return ResponseEntity.ok(updated);
+  }
+
+  @Operation(summary = "Remove uma imagem especifica de uma demanda")
+  @DeleteMapping("/{id}/images/{nomeArquivo}")
+  public ResponseEntity<?> deleteImage(@PathVariable Long id, @PathVariable String nomeArquivo) {
+
+    try {
+      Demand updated = demandService.removeImage(id, nomeArquivo);
+      return ResponseEntity.ok(updated);
+    } catch (NoSuchElementException e) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
+  }
 
-    @Operation(summary = "Remove uma imagem especifica de uma demanda")
-    @DeleteMapping("/{id}/images/{nomeArquivo}")
-    public ResponseEntity<?> deleteImage(
-            @PathVariable Long id,
-            @PathVariable String nomeArquivo) {
-
-        try {
-            Demand updated = demandService.removeImage(id, nomeArquivo);
-            return ResponseEntity.ok(updated);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
-    }
-
-    @Operation(summary = "Deleta uma demanda")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable @NonNull Long id) {
-        demandService.delete(id);
-        return ResponseEntity.ok().build();
-    }
+  @Operation(summary = "Deleta uma demanda")
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> delete(@PathVariable @NonNull Long id) {
+    demandService.delete(id);
+    return ResponseEntity.ok().build();
+  }
 }

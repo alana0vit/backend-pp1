@@ -1,11 +1,5 @@
 package br.com.conectaPro.model.user;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import org.hibernate.annotations.SQLRestriction;
-
 import br.com.conectaPro.model.category.Category;
 import br.com.conectaPro.util.entity.AudibleEntity;
 import jakarta.persistence.Column;
@@ -18,11 +12,15 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "Users")
@@ -34,47 +32,40 @@ import lombok.Setter;
 @NoArgsConstructor
 public class User extends AudibleEntity {
 
-    @Column(nullable = false, length = 100)
-    private String name;
+  @Column(nullable = false, length = 100)
+  private String name;
 
-    @Column()
-    private String enterprise;
+  @Column() private String enterprise;
 
-    @Column(unique = true)
-    private String email;
+  @Column(unique = true)
+  private String email;
 
-    @Column
-    private String password; // Hash
+  @Column private String password; // Hash
 
-    @Column
-    private LocalDate birthDate;
+  @Column private LocalDate birthDate;
 
-    @Column
-    private String phone;
+  @Column private String phone;
 
-    @Column
-    private Double rating;
+  @Column private Double rating;
 
-    @Enumerated(EnumType.STRING)
-    private UserType userType;
+  @Enumerated(EnumType.STRING)
+  private UserType userType;
 
-    @Column
-    private String registryId;
+  @Column private String registryId;
 
-    @Column
-    private String photo;
+  @Column private String photo;
 
-    @Column
-    private String recoveryToken;
+  @Column private String recoveryToken;
 
-    @Column
-    private LocalDateTime recoveryTokenExpiration;
+  @Column private LocalDateTime recoveryTokenExpiration;
 
-    @OneToMany(mappedBy = "userId", orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<AddressUser> adresses;
+  @OneToMany(mappedBy = "userId", orphanRemoval = true, fetch = FetchType.EAGER)
+  private List<AddressUser> adresses;
 
-    @ManyToMany
-    @JoinTable(name = "user_category", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
-    private List<Category> categories;
-
+  @ManyToMany
+  @JoinTable(
+      name = "user_category",
+      joinColumns = @JoinColumn(name = "user_id"),
+      inverseJoinColumns = @JoinColumn(name = "category_id"))
+  private List<Category> categories;
 }

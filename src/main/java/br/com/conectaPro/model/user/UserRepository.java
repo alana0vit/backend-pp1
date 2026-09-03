@@ -2,16 +2,17 @@ package br.com.conectaPro.model.user;
 
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByEmail(String email);
+  Optional<User> findByEmail(String email);
 
-    Optional<User> findByRecoveryToken(String recoveryToken);
+  Optional<User> findByRecoveryToken(String recoveryToken);
 
-    @Query(value = """
+  @Query(
+      value =
+          """
             SELECT DISTINCT u.*
             FROM Users u
 
@@ -54,11 +55,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
                     ) <= :radiusKm
                 )
             )
-            """, nativeQuery = true)
-    List<User> searchUsers(
-            String name,
-            Long categoryId,
-            Double latitude,
-            Double longitude,
-            Double radiusKm);
+            """,
+      nativeQuery = true)
+  List<User> searchUsers(
+      String name, Long categoryId, Double latitude, Double longitude, Double radiusKm);
 }

@@ -1,11 +1,5 @@
 package br.com.conectaPro.model.demand;
 
-import org.hibernate.annotations.SQLRestriction;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-
 import br.com.conectaPro.model.category.Category;
 import br.com.conectaPro.model.user.AddressUser;
 import br.com.conectaPro.model.user.User;
@@ -20,11 +14,15 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "Demand")
@@ -36,41 +34,34 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Demand extends AudibleEntity {
 
-    @Column(unique = true)
-    private String code;
+  @Column(unique = true)
+  private String code;
 
-    @Column(nullable = false, length = 100)
-    private String title;
+  @Column(nullable = false, length = 100)
+  private String title;
 
-    @Column(nullable = false, length = 500)
-    private String description;
+  @Column(nullable = false, length = 500)
+  private String description;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "demand_images", joinColumns = @JoinColumn(name = "demand_id"))
-    @Column(name = "img_url")
-    private List<String> imgUrl;
+  @ElementCollection(fetch = FetchType.EAGER)
+  @CollectionTable(name = "demand_images", joinColumns = @JoinColumn(name = "demand_id"))
+  @Column(name = "img_url")
+  private List<String> imgUrl;
 
-    @Column
-    private Double suggestedValue;
+  @Column private Double suggestedValue;
 
-    @Column
-    private LocalDate suggestedDate;
+  @Column private LocalDate suggestedDate;
 
-    @Column
-    private LocalDateTime openedAt;
+  @Column private LocalDateTime openedAt;
 
-    @ManyToOne
-    private AddressUser addressId;
+  @ManyToOne private AddressUser addressId;
 
-    @ManyToOne
-    private Category categoryId;
+  @ManyToOne private Category categoryId;
 
-    @ManyToOne
-    private User clientId;
+  @ManyToOne private User clientId;
 
-    @ManyToOne
-    private User professionalId;
+  @ManyToOne private User professionalId;
 
-    @Enumerated(EnumType.STRING)
-    private DemandStatus demandStatus;
+  @Enumerated(EnumType.STRING)
+  private DemandStatus demandStatus;
 }
