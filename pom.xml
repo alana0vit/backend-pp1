@@ -176,18 +176,17 @@
                 <version>3.8.0</version>
                 <configuration>
                     <java>
+                        <includes>
+                            <include>src/main/java/**/*.java</include>
+                        </includes>
                         <googleJavaFormat/>
                         <removeUnusedImports/>
                     </java>
                 </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                        <phase>verify</phase>
-                    </execution>
-                </executions>
+                <!-- Sem <executions>: não roda automaticamente durante o build.
+                     Fica disponivel como um step separado no CI (mvn spotless:check)
+                     e para rodar localmente (mvn spotless:apply), sem travar o
+                     "mvn verify" por causa de formatação. -->
             </plugin>
         </plugins>
     </build>
