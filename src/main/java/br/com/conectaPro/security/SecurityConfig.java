@@ -1,7 +1,7 @@
 package br.com.conectaPro.security;
 
 import java.util.Arrays;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -21,8 +21,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import lombok.RequiredArgsConstructor;
-
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -33,18 +31,27 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
-        .csrf(AbstractHttpConfigurer::disable)
+    http.csrf(AbstractHttpConfigurer::disable)
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-        .authorizeHttpRequests(auth -> auth
-            // Rotas públicas: login, cadastro e recuperação de senha
-            .requestMatchers("/auth/**").permitAll()
-            .requestMatchers("/api/user").permitAll() // POST criar usuário
-            .requestMatchers(HttpMethod.GET, "/api/category", "/api/category/**").permitAll()
-            .requestMatchers(HttpMethod.GET, "/api/images/**").permitAll() // servir imagens (foto do usuário / imagens da demanda)
-            .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/api-docs/**").permitAll()
-            .anyRequest().authenticated())
-        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(
+            auth ->
+                auth
+                    // Rotas públicas: login, cadastro e recuperação de senha
+                    .requestMatchers("/auth/**")
+                    .permitAll()
+                    .requestMatchers("/api/user")
+                    .permitAll() // POST criar usuário
+                    .requestMatchers(HttpMethod.GET, "/api/category", "/api/category/**")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/images/**")
+                    .permitAll() // servir imagens (foto do usuário / imagens da demanda)
+                    .requestMatchers(
+                        "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/api-docs/**")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated())
+        .sessionManagement(
+            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authenticationProvider(authenticationProvider())
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -55,7 +62,8 @@ public class SecurityConfig {
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration.setAllowedOriginPatterns(Arrays.asList("*"));
-    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+    configuration.setAllowedMethods(
+        Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
     configuration.setAllowedHeaders(Arrays.asList("*"));
     configuration.setAllowCredentials(true);
 
@@ -77,7 +85,8 @@ public class SecurityConfig {
   }
 
   @Bean
-  public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
+      throws Exception {
     return configuration.getAuthenticationManager();
   }
 }

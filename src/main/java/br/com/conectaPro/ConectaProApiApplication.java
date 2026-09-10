@@ -10,8 +10,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class ConectaProApiApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ConectaProApiApplication.class, args);
-	}
-
+  public static void main(String[] args) {
+    SpringApplication.run(ConectaProApiApplication.class, args);
+  }
 }

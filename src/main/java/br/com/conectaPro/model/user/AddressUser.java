@@ -1,8 +1,7 @@
 package br.com.conectaPro.model.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import br.com.conectaPro.util.entity.AudibleEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
@@ -24,35 +23,23 @@ import org.hibernate.annotations.SQLRestriction;
 @NoArgsConstructor
 public class AddressUser extends AudibleEntity {
 
-    @JsonIgnore
-    @ManyToOne
-    private User userId;
+  @JsonIgnore @ManyToOne private User userId;
 
-    @Column
-    private String street;
+  @Column private String street;
 
-    @Column
-    private String number;
+  @Column private String number;
 
-    @Column
-    private String neighborhood;
+  @Column private String neighborhood;
 
-    @Column
-    private String city;
+  @Column private String city;
 
-    @Column
-    private String state;
+  @Column private String state;
 
-    @Column
-    private String zipCode;
+  @Column private String zipCode;
 
-    @Column
-    private Double latitude;
+  @Column private Double latitude;
 
-    @Column
-    private Double longitude;
+  @Column private Double longitude;
 
-    @Column
-    private String supplement;
-
+  @Column private String supplement;
 }
