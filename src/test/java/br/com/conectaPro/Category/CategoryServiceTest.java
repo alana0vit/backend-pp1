@@ -1,4 +1,4 @@
-package br.com.conectaPro.model;
+package br.com.conectaPro.Category;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
