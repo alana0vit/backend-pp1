@@ -1,4 +1,4 @@
-package br.com.conectaPro.model;
+package br.com.conectaPro.Demand;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

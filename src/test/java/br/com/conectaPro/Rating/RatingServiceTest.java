@@ -1,4 +1,4 @@
-package br.com.conectaPro.model;
+package br.com.conectaPro.Rating;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
