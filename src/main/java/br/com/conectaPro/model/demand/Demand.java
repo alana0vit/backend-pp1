@@ -50,6 +50,10 @@ public class Demand extends AudibleEntity {
 
   @Column private Double suggestedValue;
 
+  // Valor definido pelo profissional no aceite (pode ser igual ao suggestedValue ou ajustado).
+  // Só é preenchido a partir do aceite (status AGUARDANDO_PAGAMENTO em diante).
+  @Column private Double finalValue;
+
   @Column private LocalDate suggestedDate;
 
   @Column private LocalDateTime openedAt;

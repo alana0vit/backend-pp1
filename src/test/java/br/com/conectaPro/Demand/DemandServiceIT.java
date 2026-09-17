@@ -164,15 +164,19 @@ class DemandServiceIT {
     }
 
     @Test
-    @DisplayName("Deve fazer update de demanda com sucesso")
+    @DisplayName("Deve aceitar demanda e, após confirmar pagamento, avançar para AGUARDANDO")
     void AtualizaDemandaComSucesso(){
         Demand demanda = new Demand();
         demanda.setTitle("Demanda teste");
         demanda.setDescription("Descrição da demanda");
         demanda.setDemandStatus(DemandStatus.ABERTO);
+        demanda.setSuggestedValue(100.0);
         Demand salva = demandRepository.save(demanda);
 
-        Demand atualizada = demandService.updateStatus(salva.getId(), DemandStatus.AGUARDANDO);
+        Demand aceita = demandService.acceptWithValue(salva.getId(), 100.0);
+        assertEquals(DemandStatus.AGUARDANDO_PAGAMENTO, aceita.getDemandStatus());
+
+        Demand atualizada = demandService.confirmarPagamento(salva.getId());
 
         assertEquals(DemandStatus.AGUARDANDO, atualizada.getDemandStatus());
     }

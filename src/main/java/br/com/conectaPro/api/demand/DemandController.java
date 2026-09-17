@@ -1,5 +1,6 @@
 package br.com.conectaPro.api.demand;
 
+import br.com.conectaPro.dto.AcceptDemandDTO;
 import br.com.conectaPro.dto.ReassignRequestDTO;
 import br.com.conectaPro.dto.StatusUpdateDTO;
 import br.com.conectaPro.model.category.Category;
@@ -155,6 +156,20 @@ public class DemandController {
 
     Demand updatedDemand = demandService.reassign(id, request.professionalId());
     return ResponseEntity.ok(updatedDemand);
+  }
+
+  @Operation(summary = "Profissional aceita a demanda e define o valor final do serviço")
+  @PatchMapping("/{id}/accept")
+  public ResponseEntity<?> accept(@PathVariable Long id, @RequestBody AcceptDemandDTO request) {
+
+    try {
+      Demand updated = demandService.acceptWithValue(id, request.getFinalValue());
+      return ResponseEntity.ok(updated);
+    } catch (NoSuchElementException e) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    } catch (IllegalStateException e) {
+      return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+    }
   }
 
   @Operation(summary = "Atualiza o status da demanda")

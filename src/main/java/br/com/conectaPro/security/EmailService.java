@@ -69,6 +69,30 @@ public class EmailService {
     enviar(para, "Nova solicitação de serviço [%s] - ConectaPro".formatted(codigo), corpo);
   }
 
+  public void notificarAguardandoPagamento(Demand demand) {
+    String para = demand.getClientId().getEmail();
+    String nomeCliente = demand.getClientId().getName();
+    String nomeProfissional = demand.getProfessionalId().getName();
+    String titulo = demand.getTitle();
+    String codigo = demand.getCode();
+    String valorFormatado = "R$ %.2f".formatted(demand.getFinalValue());
+
+    String corpo =
+        """
+                <p>Olá, <strong>%s</strong>!</p>
+                <p>O profissional <strong>%s</strong> aceitou sua solicitação e definiu o valor do serviço.</p>
+                <table>
+                  <tr><td><strong>Código:</strong></td><td>%s</td></tr>
+                  <tr><td><strong>Serviço:</strong></td><td>%s</td></tr>
+                  <tr><td><strong>Valor:</strong></td><td>%s</td></tr>
+                </table>
+                <p>Acesse o app para confirmar e efetuar o pagamento.</p>
+                """
+            .formatted(nomeCliente, nomeProfissional, codigo, titulo, valorFormatado);
+
+    enviar(para, "Valor definido, falta pagar [%s] - ConectaPro".formatted(codigo), corpo);
+  }
+
   public void notificarDemandaAceita(Demand demand) {
     String para = demand.getClientId().getEmail();
     String nomeCliente = demand.getClientId().getName();
