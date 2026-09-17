@@ -110,6 +110,67 @@ public class DemandService {
   }
 
   @Transactional
+  public Demand acceptWithValue(@NonNull Long demandId, Double finalValue) {
+    Demand demand =
+        repository
+            .findById(demandId)
+            .orElseThrow(() -> new NoSuchElementException("Demanda não encontrada."));
+
+    if (demand.getDemandStatus() != DemandStatus.ABERTO) {
+      throw new IllegalStateException(
+          "Só é possível aceitar uma demanda que esteja com status ABERTO.");
+    }
+
+    // Se o profissional não informar um valor, usa o valor sugerido pelo cliente
+    Double valorFinal = finalValue != null ? finalValue : demand.getSuggestedValue();
+    if (valorFinal == null) {
+      throw new IllegalStateException(
+          "É necessário informar um valor final (a demanda não possui valor sugerido).");
+    }
+
+    demand.setFinalValue(valorFinal);
+    demand.setDemandStatus(DemandStatus.AGUARDANDO_PAGAMENTO);
+    Demand saved = repository.save(demand);
+
+    try {
+      emailService.notificarAguardandoPagamento(saved);
+    } catch (Exception e) {
+      System.err.println("Erro ao notificar aguardando pagamento: " + e.getMessage());
+    }
+
+    return saved;
+  }
+
+  /**
+   * Chamado internamente pelo PaymentService quando um pagamento é aprovado. Não é exposto
+   * diretamente ao cliente/profissional via controller — só o fluxo de pagamento pode levar a
+   * demanda de AGUARDANDO_PAGAMENTO para AGUARDANDO.
+   */
+  @Transactional
+  public Demand confirmarPagamento(@NonNull Long demandId) {
+    Demand demand =
+        repository
+            .findById(demandId)
+            .orElseThrow(() -> new NoSuchElementException("Demanda não encontrada."));
+
+    if (demand.getDemandStatus() != DemandStatus.AGUARDANDO_PAGAMENTO) {
+      throw new IllegalStateException(
+          "Só é possível confirmar pagamento de uma demanda aguardando pagamento.");
+    }
+
+    demand.setDemandStatus(DemandStatus.AGUARDANDO);
+    Demand saved = repository.save(demand);
+
+    try {
+      emailService.notificarDemandaAceita(saved);
+    } catch (Exception e) {
+      System.err.println("Erro ao notificar demanda aceita (pós-pagamento): " + e.getMessage());
+    }
+
+    return saved;
+  }
+
+  @Transactional
   public Demand updateStatus(Long id, DemandStatus status) {
     Demand demand =
         repository
@@ -125,10 +186,15 @@ public class DemandService {
 
     switch (currentStatus) {
       case ABERTO:
-        if (status != DemandStatus.AGUARDANDO && status != DemandStatus.REJEITADO) {
+        if (status != DemandStatus.REJEITADO) {
           throw new IllegalStateException("Transição inválida: ABERTO → " + status);
         }
         break;
+
+      case AGUARDANDO_PAGAMENTO:
+        throw new IllegalStateException(
+            "O status de uma demanda aguardando pagamento só muda através do fluxo de "
+                + "pagamento (endpoints /api/payments).");
 
       case AGUARDANDO:
         if (status != DemandStatus.FECHADO) {
@@ -153,7 +219,6 @@ public class DemandService {
 
     try {
       switch (status) {
-        case AGUARDANDO -> emailService.notificarDemandaAceita(saved);
         case REJEITADO -> emailService.notificarDemandaRejeitada(saved);
         case FECHADO -> emailService.notificarDemandaFechada(saved);
         default -> {}

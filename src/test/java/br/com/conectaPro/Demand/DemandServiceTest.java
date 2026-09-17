@@ -166,19 +166,22 @@ import br.com.conectaPro.util.Util;
     }
 
     @Test
-    @DisplayName("Update no status da demanda")
+    @DisplayName("Profissional aceita a demanda e define o valor final")
     void updateDemandaStatus(){
         Long id = 1L; 
 
         Demand demanda = new Demand();
         demanda.setId(id);
         demanda.setDemandStatus(DemandStatus.ABERTO);
+        demanda.setSuggestedValue(100.0);
 
         when(demandRepository.findById(id)).thenReturn(java.util.Optional.of(demanda));
         when(demandRepository.save(any(Demand.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        demandService.updateStatus(id, DemandStatus.AGUARDANDO);
-        assertEquals(DemandStatus.AGUARDANDO, demanda.getDemandStatus());
+        Demand resultado = demandService.acceptWithValue(id, 120.0);
+
+        assertEquals(DemandStatus.AGUARDANDO_PAGAMENTO, resultado.getDemandStatus());
+        assertEquals(120.0, resultado.getFinalValue());
     }
 
     @Test
@@ -243,18 +246,19 @@ import br.com.conectaPro.util.Util;
     }
 
     @Test
-    @DisplayName("Update status com sucesso")
+    @DisplayName("Confirma pagamento e avança a demanda para AGUARDANDO")
     void updateStatus(){
         Long id = 1L;
 
         Demand demanda = new Demand();
         demanda.setId(id);
-        demanda.setDemandStatus(DemandStatus.ABERTO);
+        demanda.setDemandStatus(DemandStatus.AGUARDANDO_PAGAMENTO);
+        demanda.setFinalValue(120.0);
 
         when(demandRepository.findById(id)).thenReturn(java.util.Optional.of(demanda));
         when(demandRepository.save(any(Demand.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        demandService.updateStatus(id, DemandStatus.AGUARDANDO);
+        demandService.confirmarPagamento(id);
         assertEquals(DemandStatus.AGUARDANDO, demanda.getDemandStatus());
     }
 
