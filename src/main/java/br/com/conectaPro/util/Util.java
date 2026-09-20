@@ -85,7 +85,8 @@ public class Util {
       s3Client.deleteObject(DeleteObjectRequest.builder().bucket(bucketName).key(key).build());
       return true;
     } catch (S3Exception e) {
-      System.out.println("Falha ao apagar o arquivo '" + nomeArquivo + "' do R2: " + e.getMessage());
+      System.out.println(
+          "Falha ao apagar o arquivo '" + nomeArquivo + "' do R2: " + e.getMessage());
       return false;
     }
   }
@@ -106,7 +107,8 @@ public class Util {
     } catch (NoSuchKeyException e) {
       return null;
     } catch (S3Exception e) {
-      System.out.println("Falha ao baixar o arquivo '" + nomeArquivo + "' do R2: " + e.getMessage());
+      System.out.println(
+          "Falha ao baixar o arquivo '" + nomeArquivo + "' do R2: " + e.getMessage());
       return null;
     }
   }
@@ -114,8 +116,8 @@ public class Util {
   /**
    * Valida que o nome de arquivo informado tem o formato esperado (o mesmo que geramos em
    * fazerUploadImagem) e monta a chave completa dentro do bucket. Retorna null se o nome for
-   * nulo/vazio ou não bater com o formato esperado — isso também bloqueia qualquer tentativa de
-   * usar "/" ou ".." para acessar outra chave/prefixo do bucket.
+   * nulo/vazio ou não bater com o formato esperado — isso também bloqueia qualquer tentativa
+   * de usar "/" ou ".." para acessar outra chave/prefixo do bucket.
    */
   private static String validarEChavear(String nomeArquivo) {
     if (nomeArquivo == null || nomeArquivo.isBlank()) {

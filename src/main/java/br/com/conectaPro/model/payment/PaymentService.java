@@ -1,18 +1,16 @@
 package br.com.conectaPro.model.payment;
 
-import java.time.LocalDateTime;
-import java.util.NoSuchElementException;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Service;
-
 import br.com.conectaPro.model.demand.Demand;
 import br.com.conectaPro.model.demand.DemandService;
 import br.com.conectaPro.model.demand.DemandStatus;
 import br.com.conectaPro.model.payment.gateway.PaymentGateway;
 import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Service;
 
 @Service
 public class PaymentService {

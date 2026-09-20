@@ -17,10 +17,10 @@ import lombok.Setter;
 import org.hibernate.annotations.SQLRestriction;
 
 /**
- * Representa uma cobrança gerada para uma demanda. Hoje é processada por um gateway "fake"
- * (nenhum dinheiro é movido de verdade), mas o modelo já reflete o que uma integração real (ex:
- * Mercado Pago) precisaria: valor total, taxa da plataforma, valor líquido do profissional e
- * status do pagamento.
+ * Representa uma cobrança gerada para uma demanda. Hoje é processada por um gateway "fake" (nenhum
+ * dinheiro é movido de verdade), mas o modelo já reflete o que uma integração real (ex: Mercado
+ * Pago) precisaria: valor total, taxa da plataforma, valor líquido do profissional e status do
+ * pagamento.
  */
 @Entity
 @Table(name = "Payment")
@@ -35,7 +35,8 @@ public class Payment extends AudibleEntity {
   @ManyToOne private Demand demand;
 
   @Column(nullable = false)
-  private Double amount; // valor total cobrado do cliente (= demand.finalValue no momento da criação)
+  private Double
+      amount; // valor total cobrado do cliente (= demand.finalValue no momento da criação)
 
   @Column(nullable = false)
   private Double platformFeeAmount; // fatia da plataforma
