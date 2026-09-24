@@ -46,6 +46,15 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.GET, "/api/images/**")
                     .permitAll() // servir imagens (foto do usuário / imagens da demanda)
                     .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/payments/*/fake-checkout") // tela de checkout simulada
+                    .permitAll()
+                    .requestMatchers(
+                        HttpMethod.POST,
+                        "/api/payments/*/aprovar",
+                        "/api/payments/*/recusar") // ações do checkout simulado / futuro webhook
+                    .permitAll()
+                    .requestMatchers(
                         "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/api-docs/**")
                     .permitAll()
                     .anyRequest()
