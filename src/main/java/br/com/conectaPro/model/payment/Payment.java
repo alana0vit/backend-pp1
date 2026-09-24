@@ -1,6 +1,7 @@
 package br.com.conectaPro.model.payment;
 
 import br.com.conectaPro.model.demand.Demand;
+import br.com.conectaPro.model.subscription.Subscription;
 import br.com.conectaPro.util.entity.AudibleEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,10 +18,11 @@ import lombok.Setter;
 import org.hibernate.annotations.SQLRestriction;
 
 /**
- * Representa uma cobrança gerada para uma demanda. Hoje é processada por um gateway "fake" (nenhum
- * dinheiro é movido de verdade), mas o modelo já reflete o que uma integração real (ex: Mercado
- * Pago) precisaria: valor total, taxa da plataforma, valor líquido do profissional e status do
- * pagamento.
+ * Representa uma cobrança gerada para uma demanda (type=DEMANDA) ou para uma assinatura de plano
+ * (type=ASSINATURA) — só um dos dois campos (demand/subscription) é preenchido, dependendo do
+ * type. É processada por um gateway "fake" (nenhum dinheiro é movido de verdade), mas o modelo já
+ * reflete o que uma integração real (ex: Mercado Pago) precisaria: valor total, taxa da
+ * plataforma, valor líquido do profissional e status do pagamento.
  */
 @Entity
 @Table(name = "Payment")
@@ -32,14 +34,19 @@ import org.hibernate.annotations.SQLRestriction;
 @NoArgsConstructor
 public class Payment extends AudibleEntity {
 
-  @ManyToOne private Demand demand;
+  @Enumerated(EnumType.STRING)
+  private PaymentType type;
+
+  @ManyToOne private Demand demand; // preenchido quando type = DEMANDA
+
+  @ManyToOne private Subscription subscription; // preenchido quando type = ASSINATURA
 
   @Column(nullable = false)
   private Double
-      amount; // valor total cobrado do cliente (= demand.finalValue no momento da criação)
+      amount; // valor total cobrado (= demand.finalValue ou plan.price no momento da criação)
 
   @Column(nullable = false)
-  private Double platformFeeAmount; // fatia da plataforma
+  private Double platformFeeAmount; // fatia da plataforma (0 para pagamento de assinatura)
 
   @Column(nullable = false)
   private Double professionalAmount; // fatia do profissional (amount - platformFeeAmount)
@@ -52,3 +59,4 @@ public class Payment extends AudibleEntity {
 
   private LocalDateTime paidAt;
 }
+

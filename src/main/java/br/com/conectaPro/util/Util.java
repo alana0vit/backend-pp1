@@ -92,9 +92,9 @@ public class Util {
   }
 
   /**
-   * Baixa do R2 o conteúdo (bytes + metadados) do arquivo com o nome informado. Usado pelo
-   * endpoint que serve as imagens (GET). Retorna null caso o nome seja inválido ou o objeto não
-   * exista no bucket.
+   * Baixa do R2 o conteúdo (bytes + metadados) do arquivo com o nome informado. Usado pelo endpoint
+   * que serve as imagens (GET). Retorna null caso o nome seja inválido ou o objeto não exista
+   * no bucket.
    */
   public static ResponseInputStream<GetObjectResponse> baixarImagem(String nomeArquivo) {
     String key = validarEChavear(nomeArquivo);
@@ -116,8 +116,8 @@ public class Util {
   /**
    * Valida que o nome de arquivo informado tem o formato esperado (o mesmo que geramos em
    * fazerUploadImagem) e monta a chave completa dentro do bucket. Retorna null se o nome for
-   * nulo/vazio ou não bater com o formato esperado — isso também bloqueia qualquer tentativa
-   * de usar "/" ou ".." para acessar outra chave/prefixo do bucket.
+   * nulo/vazio ou não bater com o formato esperado — isso também bloqueia qualquer tentativa de
+   * usar "/" ou ".." para acessar outra chave/prefixo do bucket.
    */
   private static String validarEChavear(String nomeArquivo) {
     if (nomeArquivo == null || nomeArquivo.isBlank()) {
