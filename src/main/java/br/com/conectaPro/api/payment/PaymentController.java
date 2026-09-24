@@ -32,9 +32,9 @@ public class PaymentController {
 
   @Operation(summary = "Gera uma cobrança para a demanda (deve estar AGUARDANDO_PAGAMENTO)")
   @PostMapping("/demand/{demandId}/checkout")
-  public ResponseEntity<?> criarCheckout(@PathVariable Long demandId) {
+  public ResponseEntity<?> criarCheckoutDemanda(@PathVariable Long demandId) {
     try {
-      Payment payment = paymentService.criarCheckout(demandId);
+      Payment payment = paymentService.criarCheckoutDemanda(demandId);
       String checkoutUrl = paymentService.getCheckoutUrl(payment);
 
       return ResponseEntity.ok(

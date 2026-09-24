@@ -55,6 +55,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
                     ) <= :radiusKm
                 )
             )
+
+            ORDER BY u.priority_weight DESC NULLS LAST, u.id ASC
             """,
       nativeQuery = true)
   List<User> searchUsers(

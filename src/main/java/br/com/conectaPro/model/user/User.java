@@ -2,6 +2,7 @@ package br.com.conectaPro.model.user;
 
 import br.com.conectaPro.model.category.Category;
 import br.com.conectaPro.util.entity.AudibleEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -40,7 +41,9 @@ public class User extends AudibleEntity {
   @Column(unique = true)
   private String email;
 
-  @Column private String password; // Hash
+  @JsonIgnore
+  @Column
+  private String password; // Hash — nunca deve sair em resposta de API
 
   @Column private LocalDate birthDate;
 
@@ -55,9 +58,13 @@ public class User extends AudibleEntity {
 
   @Column private String photo;
 
-  @Column private String recoveryToken;
+  @JsonIgnore
+  @Column
+  private String recoveryToken; // usado só no fluxo de "esqueci minha senha", nunca em resposta
 
-  @Column private LocalDateTime recoveryTokenExpiration;
+  @JsonIgnore
+  @Column
+  private LocalDateTime recoveryTokenExpiration;
 
   @OneToMany(mappedBy = "userId", orphanRemoval = true, fetch = FetchType.EAGER)
   private List<AddressUser> adresses;
@@ -68,4 +75,23 @@ public class User extends AudibleEntity {
       joinColumns = @JoinColumn(name = "user_id"),
       inverseJoinColumns = @JoinColumn(name = "category_id"))
   private List<Category> categories;
+
+  // Campos denormalizados a partir da assinatura ativa (ver model.subscription).
+  // Mantidos aqui (em vez de um JOIN na busca) para não mexer na query nativa de
+  // busca por raio/categoria, que usa SELECT DISTINCT (JOIN + ORDER BY por coluna
+  // fora do SELECT quebraria isso). Atualizados pelo SubscriptionService sempre que
+  // uma assinatura é ativada/expira/cancelada.
+  // Sem nullable=false de propósito: evita quebrar o ALTER TABLE em bancos que já
+  // têm linhas (o default abaixo só vale para objetos novos criados na JVM).
+  @Builder.Default
+  @Column
+  private Boolean verified = false;
+
+  // Usado só para ordenar a busca (maior = aparece antes). null/0 = sem plano.
+  @Builder.Default
+  @Column
+  private Integer priorityWeight = 0;
+
+  // Nome do plano ativo, para exibir o selo sem precisar buscar a assinatura à parte.
+  @Column private String activePlanName;
 }
