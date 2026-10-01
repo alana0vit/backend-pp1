@@ -16,6 +16,8 @@ public record UserResponseDTO(
     String registryId,
     Double rating,
     String photo,
+    Boolean verified,
+    String activePlanName,
     List<CategoryBasicDTO> categories,
     List<AddressBasicDTO> adresses) {
 
@@ -70,6 +72,8 @@ public record UserResponseDTO(
         user.getRegistryId(),
         user.getRating(),
         user.getPhoto(),
+        user.getVerified(),
+        user.getActivePlanName(),
         categoryDTOs,
         addressDTOs);
   }

@@ -4,6 +4,10 @@ import br.com.conectaPro.model.demand.Demand;
 import br.com.conectaPro.model.demand.DemandService;
 import br.com.conectaPro.model.demand.DemandStatus;
 import br.com.conectaPro.model.payment.gateway.PaymentGateway;
+import br.com.conectaPro.model.subscription.Subscription;
+import br.com.conectaPro.model.subscription.SubscriptionPlan;
+import br.com.conectaPro.model.subscription.SubscriptionService;
+import br.com.conectaPro.model.subscription.SubscriptionStatus;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
@@ -19,17 +23,21 @@ public class PaymentService {
 
   @Autowired private DemandService demandService;
 
+  @Autowired private SubscriptionService subscriptionService;
+
   @Autowired private PaymentGateway paymentGateway;
 
   @Value("${payment.platform.fee.percentage}")
-  private Double platformFeePercentage;
+  private Double defaultPlatformFeePercentage;
 
   /**
-   * Cria uma nova cobrança para a demanda (deve estar em AGUARDANDO_PAGAMENTO) e retorna o
-   * Payment já com a URL de checkout preenchida via {@link #getCheckoutUrl}.
+   * Cria uma nova cobrança para a demanda (deve estar em AGUARDANDO_PAGAMENTO) e retorna o Payment
+   * já com a URL de checkout preenchida via {@link #getCheckoutUrl}. A taxa de plataforma usada é
+   * a do plano ativo do profissional, se houver (ver {@link SubscriptionService}), senão a taxa
+   * padrão configurada.
    */
   @Transactional
-  public Payment criarCheckout(@NonNull Long demandId) {
+  public Payment criarCheckoutDemanda(@NonNull Long demandId) {
     Demand demand = demandService.getById(demandId);
 
     if (demand.getDemandStatus() != DemandStatus.AGUARDANDO_PAGAMENTO) {
@@ -42,16 +50,49 @@ public class PaymentService {
     }
 
     double amount = demand.getFinalValue();
-    double platformFeeAmount = arredondar(amount * platformFeePercentage);
+    double feePercentage =
+        subscriptionService.getPlatformFeePercentage(
+            demand.getProfessionalId().getId(), defaultPlatformFeePercentage);
+    double platformFeeAmount = arredondar(amount * feePercentage);
     double professionalAmount = arredondar(amount - platformFeeAmount);
 
     Payment payment =
         Payment.builder()
+            .type(PaymentType.DEMANDA)
             .demand(demand)
             .amount(amount)
             .platformFeeAmount(platformFeeAmount)
             .professionalAmount(professionalAmount)
-            .platformFeePercentage(platformFeePercentage)
+            .platformFeePercentage(feePercentage)
+            .status(PaymentStatus.PENDENTE)
+            .build();
+    payment.setEnabled(Boolean.TRUE);
+
+    return repository.save(payment);
+  }
+
+  /**
+   * Cria a cobrança de uma assinatura de plano já iniciada (ver {@link
+   * SubscriptionService#iniciarAssinatura}). Aqui não há taxa de plataforma — o valor integral vai
+   * pro profissional assinante (a "taxa" nesse caso é o próprio valor do plano).
+   */
+  @Transactional
+  public Payment criarCheckoutAssinatura(@NonNull Subscription subscription) {
+    if (subscription.getStatus() != SubscriptionStatus.PENDENTE) {
+      throw new IllegalStateException("Só é possível gerar cobrança para uma assinatura pendente.");
+    }
+
+    SubscriptionPlan plan = subscription.getPlan();
+    double amount = plan.getPrice();
+
+    Payment payment =
+        Payment.builder()
+            .type(PaymentType.ASSINATURA)
+            .subscription(subscription)
+            .amount(amount)
+            .platformFeeAmount(0.0)
+            .professionalAmount(amount)
+            .platformFeePercentage(0.0)
             .status(PaymentStatus.PENDENTE)
             .build();
     payment.setEnabled(Boolean.TRUE);
@@ -71,7 +112,8 @@ public class PaymentService {
 
   /**
    * Aprova o pagamento (chamado pela tela/endpoint de simulação hoje; seria chamado pelo webhook
-   * de um gateway real no futuro) e avança a demanda para AGUARDANDO.
+   * de um gateway real no futuro) e avança a demanda para AGUARDANDO, ou ativa a assinatura,
+   * dependendo do {@link PaymentType}.
    */
   @Transactional
   public Payment aprovar(@NonNull Long paymentId) {
@@ -85,7 +127,10 @@ public class PaymentService {
     payment.setPaidAt(LocalDateTime.now());
     Payment saved = repository.save(payment);
 
-    demandService.confirmarPagamento(payment.getDemand().getId());
+    switch (payment.getType()) {
+      case DEMANDA -> demandService.confirmarPagamento(payment.getDemand().getId());
+      case ASSINATURA -> subscriptionService.ativar(payment.getSubscription().getId());
+    }
 
     return saved;
   }
@@ -99,7 +144,7 @@ public class PaymentService {
     }
 
     payment.setStatus(PaymentStatus.RECUSADO);
-    // A demanda permanece em AGUARDANDO_PAGAMENTO; o cliente pode gerar uma nova cobrança.
+    // A demanda/assinatura permanece pendente; dá pra gerar uma nova cobrança.
     return repository.save(payment);
   }
 
@@ -107,3 +152,4 @@ public class PaymentService {
     return Math.round(valor * 100.0) / 100.0;
   }
 }
+

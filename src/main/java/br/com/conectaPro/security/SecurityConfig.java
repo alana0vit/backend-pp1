@@ -43,6 +43,8 @@ public class SecurityConfig {
                     .permitAll() // POST criar usuário
                     .requestMatchers(HttpMethod.GET, "/api/category", "/api/category/**")
                     .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/subscriptions/plans")
+                    .permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/images/**")
                     .permitAll() // servir imagens (foto do usuário / imagens da demanda)
                     .requestMatchers(
