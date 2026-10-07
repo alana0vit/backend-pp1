@@ -200,6 +200,29 @@ public class UserService {
     return userRepository.searchUsers(name, categoryId, latitude, longitude, radiusKm);
   }
 
+  /**
+   * Busca para o mapa: igual à busca normal, mas rejeita combinações de parâmetros que fariam o
+   * filtro por raio ser ignorado em silêncio (ex.: radiusKm sem latitude/longitude).
+   */
+  public List<User> searchForMap(
+      String name, Long categoryId, Double latitude, Double longitude, Double radiusKm) {
+
+    if ((latitude == null) != (longitude == null)) {
+      throw new IllegalArgumentException("Informe latitude e longitude juntas.");
+    }
+    if (radiusKm != null && latitude == null) {
+      throw new IllegalArgumentException("radiusKm exige latitude e longitude.");
+    }
+    if (latitude != null && (latitude < -90 || latitude > 90)) {
+      throw new IllegalArgumentException("latitude deve estar entre -90 e 90.");
+    }
+    if (longitude != null && (longitude < -180 || longitude > 180)) {
+      throw new IllegalArgumentException("longitude deve estar entre -180 e 180.");
+    }
+
+    return search(name, categoryId, latitude, longitude, radiusKm);
+  }
+
   // Endereços
 
   public List<AddressUser> getAllAddressByUser(Long userId) {

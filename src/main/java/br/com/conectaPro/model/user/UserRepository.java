@@ -46,11 +46,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
                     AND a.longitude IS NOT NULL
                     AND (
                         6371 * acos(
-                            cos(radians(:latitude))
-                            * cos(radians(a.latitude))
-                            * cos(radians(a.longitude) - radians(:longitude))
-                            + sin(radians(:latitude))
-                            * sin(radians(a.latitude))
+                            LEAST(1.0, GREATEST(-1.0,
+                                cos(radians(:latitude))
+                                * cos(radians(a.latitude))
+                                * cos(radians(a.longitude) - radians(:longitude))
+                                + sin(radians(:latitude))
+                                * sin(radians(a.latitude))
+                            ))
                         )
                     ) <= :radiusKm
                 )

@@ -42,6 +42,30 @@ public class DemandService {
     return repository.findAll();
   }
 
+  /** Demandas em que o usuário é o cliente ou o profissional (nunca as dos outros). */
+  public List<Demand> getAllForUser(Long userId) {
+    return repository.findAll().stream().filter(d -> isParticipant(d, userId)).toList();
+  }
+
+  /** Igual a getById, mas devolve "não encontrada" (404) se o usuário não participa da demanda. */
+  public Demand getByIdForUser(@NonNull Long id, Long userId) {
+    Demand demand = getById(id);
+    if (!isParticipant(demand, userId)) {
+      throw new NoSuchElementException("Demanda não encontrada com ID: " + id);
+    }
+    return demand;
+  }
+
+  private boolean isParticipant(Demand demand, Long userId) {
+    if (userId == null) {
+      return false;
+    }
+    User client = demand.getClientId();
+    User professional = demand.getProfessionalId();
+    return (client != null && userId.equals(client.getId()))
+        || (professional != null && userId.equals(professional.getId()));
+  }
+
   public Demand getById(@NonNull Long id) {
     return repository
         .findById(id)
