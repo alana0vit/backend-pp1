@@ -59,6 +59,9 @@ public class SecurityConfig {
                     .requestMatchers(
                         "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/api-docs/**")
                     .permitAll()
+                    // sem isso, erros 400/404/500 viram 403 para quem não tem token
+                    .requestMatchers("/error")
+                    .permitAll()
                     .anyRequest()
                     .authenticated())
         .sessionManagement(

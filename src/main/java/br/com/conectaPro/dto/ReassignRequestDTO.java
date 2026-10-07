@@ -1,5 +1,5 @@
 package br.com.conectaPro.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
-public record ReassignRequestDTO(@NotBlank Long professionalId) {}
+public record ReassignRequestDTO(@NotNull Long professionalId) {}

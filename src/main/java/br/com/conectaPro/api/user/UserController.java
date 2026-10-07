@@ -75,6 +75,10 @@ public class UserController {
   public ResponseEntity<UserResponseDTO> updatePhoto(
       @PathVariable Long id, @RequestParam("foto") MultipartFile foto) {
 
+    if (foto == null || foto.isEmpty()) {
+      throw new IllegalArgumentException("Arquivo de imagem vazio ou não enviado (campo 'foto').");
+    }
+
     User user = userService.updatePhoto(id, foto);
     return ResponseEntity.ok(UserResponseDTO.fromEntity(user));
   }

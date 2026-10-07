@@ -59,14 +59,17 @@ public class Util {
               .contentType(imagem.getContentType())
               .build();
 
-      s3Client.putObject(
-          request, RequestBody.fromInputStream(imagem.getInputStream(), imagem.getSize()));
+      // fromBytes (e não fromInputStream): o stream do upload não volta ao início, e o SDK
+      // (>= 2.30) precisa reler o conteúdo para calcular o checksum / refazer a requisição.
+      s3Client.putObject(request, RequestBody.fromBytes(imagem.getBytes()));
 
       System.out.println("Arquivo armazenado no R2 com a chave: " + key);
       return nomeArquivo;
 
     } catch (Exception e) {
-      System.out.println("Falha ao enviar o arquivo para o R2: " + e.getMessage());
+      String motivo = e.getClass().getSimpleName() + ": " + e.getMessage();
+      System.out.println("Falha ao enviar o arquivo para o R2: " + motivo);
+      e.printStackTrace();
       return null;
     }
   }
