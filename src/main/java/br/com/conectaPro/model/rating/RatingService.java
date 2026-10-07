@@ -62,12 +62,12 @@ public class RatingService {
     Rating rating =
         repository
             .findById(id)
-            .orElseThrow(() -> new RuntimeException("Avaliação não encontrada."));
+            .orElseThrow(() -> new NoSuchElementException("Avaliação não encontrada."));
     if (rating.getStatus() != EvaluateStatus.PENDENTE) {
-      throw new RuntimeException("Avaliação já finalizada.");
+      throw new IllegalStateException("Avaliação já finalizada.");
     }
     if (request.getApproved() == null) {
-      throw new RuntimeException("approved é obrigatório.");
+      throw new IllegalArgumentException("approved é obrigatório.");
     }
     if (Boolean.FALSE.equals(request.getApproved())) {
       rating.setStatus(EvaluateStatus.REJEITADO);
@@ -75,10 +75,10 @@ public class RatingService {
       return;
     }
     if (request.getPoints() == null) {
-      throw new RuntimeException("Pontuação obrigatória.");
+      throw new IllegalArgumentException("Pontuação obrigatória.");
     }
     if (request.getPoints() < 1 || request.getPoints() > 5) {
-      throw new RuntimeException("Pontuação inválida.");
+      throw new IllegalArgumentException("Pontuação inválida.");
     }
     rating.setPoints(request.getPoints());
     rating.setDescription(request.getDescription());

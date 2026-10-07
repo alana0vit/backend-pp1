@@ -9,6 +9,7 @@ import br.com.conectaPro.util.Util;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,6 +40,10 @@ public class UserService {
   @Transactional
   public User save(UserRequest userRequest) {
     validateProfessionalCategories(userRequest.getUserType(), userRequest.getCategoriesIds());
+
+    if (userRepository.findByEmail(userRequest.getEmail()).isPresent()) {
+      throw new IllegalStateException("E-mail já cadastrado.");
+    }
 
     User user = userRequest.build();
 
@@ -85,7 +90,8 @@ public class UserService {
   public User findByEmail(String email) {
     return userRepository
         .findByEmail(email)
-        .orElseThrow(() -> new RuntimeException("Usuário não encontrado com o email: " + email));
+        .orElseThrow(
+            () -> new NoSuchElementException("Usuário não encontrado com o email: " + email));
   }
 
   public List<User> getAll() {
@@ -95,7 +101,7 @@ public class UserService {
   public User getById(Long id) {
     return userRepository
         .findById(id)
-        .orElseThrow(() -> new RuntimeException("Usuário não encontrado com o ID: " + id));
+        .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado com o ID: " + id));
   }
 
   @Transactional
@@ -104,7 +110,8 @@ public class UserService {
     User user =
         userRepository
             .findById(id)
-            .orElseThrow(() -> new RuntimeException("Usuário não encontrado com o ID: " + id));
+            .orElseThrow(
+                () -> new NoSuchElementException("Usuário não encontrado com o ID: " + id));
 
     validateProfessionalCategories(userRequest.getUserType(), userRequest.getCategoriesIds());
 
@@ -136,7 +143,8 @@ public class UserService {
     User user =
         userRepository
             .findById(id)
-            .orElseThrow(() -> new RuntimeException("Usuário não encontrado com o ID: " + id));
+            .orElseThrow(
+                () -> new NoSuchElementException("Usuário não encontrado com o ID: " + id));
     user.setEnabled(Boolean.FALSE);
     userRepository.save(user);
   }
@@ -146,7 +154,8 @@ public class UserService {
     User user =
         userRepository
             .findById(id)
-            .orElseThrow(() -> new RuntimeException("Usuário não encontrado com o ID: " + id));
+            .orElseThrow(
+                () -> new NoSuchElementException("Usuário não encontrado com o ID: " + id));
 
     String nomeArquivo = Util.fazerUploadImagem(foto);
     if (nomeArquivo == null) {
@@ -170,7 +179,8 @@ public class UserService {
     User user =
         userRepository
             .findById(id)
-            .orElseThrow(() -> new RuntimeException("Usuário não encontrado com o ID: " + id));
+            .orElseThrow(
+                () -> new NoSuchElementException("Usuário não encontrado com o ID: " + id));
 
     if (user.getPhoto() != null && !user.getPhoto().isBlank()) {
       Util.apagarImagem(user.getPhoto());
@@ -200,7 +210,7 @@ public class UserService {
   public AddressUser getAddressById(Long id) {
     return addressUserRepository
         .findById(id)
-        .orElseThrow(() -> new RuntimeException("Endereço não encontrado"));
+        .orElseThrow(() -> new NoSuchElementException("Endereço não encontrado"));
   }
 
   @Transactional
@@ -235,7 +245,8 @@ public class UserService {
     AddressUser address =
         addressUserRepository
             .findById(id)
-            .orElseThrow(() -> new RuntimeException("Endereço não encontrado com o ID: " + id));
+            .orElseThrow(
+                () -> new NoSuchElementException("Endereço não encontrado com o ID: " + id));
 
     address.setStreet(addressChanged.getStreet());
     address.setNumber(addressChanged.getNumber());
@@ -245,9 +256,17 @@ public class UserService {
     address.setZipCode(addressChanged.getZipCode());
     address.setSupplement(addressChanged.getSupplement());
 
-    CoordinatesDTO coords = geoLocationService.getCoordinates(address);
-    address.setLatitude(Double.valueOf(coords.getLat()));
-    address.setLongitude(Double.valueOf(coords.getLon()));
+    // Igual ao cadastro: se o geocoding falhar, não derruba a edição. As coordenadas antigas não
+    // valem mais para o endereço novo, então são limpas (o endereço fica fora da busca por raio).
+    try {
+      CoordinatesDTO coords = geoLocationService.getCoordinates(address);
+      address.setLatitude(Double.valueOf(coords.getLat()));
+      address.setLongitude(Double.valueOf(coords.getLon()));
+    } catch (Exception e) {
+      System.out.println("ERRO GEOLOCALIZACAO: " + e.getMessage());
+      address.setLatitude(null);
+      address.setLongitude(null);
+    }
 
     return addressUserRepository.save(address);
   }
@@ -258,7 +277,7 @@ public class UserService {
         addressUserRepository
             .findById(idAddress)
             .orElseThrow(
-                () -> new RuntimeException("Endereço não encontrado com o ID: " + idAddress));
+                () -> new NoSuchElementException("Endereço não encontrado com o ID: " + idAddress));
 
     address.setEnabled(Boolean.FALSE);
     addressUserRepository.save(address);

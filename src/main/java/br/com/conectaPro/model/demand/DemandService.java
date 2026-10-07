@@ -59,8 +59,19 @@ public class DemandService {
       throw new IllegalStateException("Não é permitido editar um serviço aceito ou finalizado!");
     }
 
-    demand.setTitle(demandChanged.getTitle());
-    demand.setDescription(demandChanged.getDescription());
+    // PATCH parcial: só altera o que veio preenchido (title/description são NOT NULL no banco)
+    if (demandChanged.getTitle() != null) {
+      demand.setTitle(demandChanged.getTitle());
+    }
+    if (demandChanged.getDescription() != null) {
+      demand.setDescription(demandChanged.getDescription());
+    }
+    if (demandChanged.getSuggestedValue() != null) {
+      demand.setSuggestedValue(demandChanged.getSuggestedValue());
+    }
+    if (demandChanged.getSuggestedDate() != null) {
+      demand.setSuggestedDate(demandChanged.getSuggestedDate());
+    }
 
     if (demandChanged.getImgUrl() != null) {
       demand.setImgUrl(demandChanged.getImgUrl());

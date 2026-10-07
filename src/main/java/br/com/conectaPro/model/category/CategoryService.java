@@ -2,6 +2,7 @@ package br.com.conectaPro.model.category;
 
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.NoSuchElementException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,9 @@ public class CategoryService {
 
   public Category getById(Long id) {
 
-    return repository.findById(id).get();
+    return repository
+        .findById(id)
+        .orElseThrow(() -> new NoSuchElementException("Categoria não encontrada com o ID: " + id));
   }
 
   @Transactional
