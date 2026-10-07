@@ -38,34 +38,33 @@ public class User extends AudibleEntity {
 
   @Column() private String enterprise;
 
+  // Dados pessoais fora do JSON da entidade: ela aparece aninhada em Demand/Rating/Payment/
+  // Subscription. Quem precisa expor (perfil próprio, contato liberado após o pagamento) usa DTO.
+  @JsonIgnore
   @Column(unique = true)
   private String email;
 
-  @JsonIgnore
-  @Column
-  private String password; // Hash — nunca deve sair em resposta de API
+  @JsonIgnore @Column private String password; // Hash — nunca deve sair em resposta de API
 
-  @Column private LocalDate birthDate;
+  @JsonIgnore @Column private LocalDate birthDate;
 
-  @Column private String phone;
+  @JsonIgnore @Column private String phone;
 
   @Column private Double rating;
 
   @Enumerated(EnumType.STRING)
   private UserType userType;
 
-  @Column private String registryId;
+  @JsonIgnore @Column private String registryId;
 
   @Column private String photo;
 
-  @JsonIgnore
-  @Column
+  @JsonIgnore @Column
   private String recoveryToken; // usado só no fluxo de "esqueci minha senha", nunca em resposta
 
-  @JsonIgnore
-  @Column
-  private LocalDateTime recoveryTokenExpiration;
+  @JsonIgnore @Column private LocalDateTime recoveryTokenExpiration;
 
+  @JsonIgnore
   @OneToMany(mappedBy = "userId", orphanRemoval = true, fetch = FetchType.EAGER)
   private List<AddressUser> adresses;
 
@@ -83,14 +82,10 @@ public class User extends AudibleEntity {
   // uma assinatura é ativada/expira/cancelada.
   // Sem nullable=false de propósito: evita quebrar o ALTER TABLE em bancos que já
   // têm linhas (o default abaixo só vale para objetos novos criados na JVM).
-  @Builder.Default
-  @Column
-  private Boolean verified = false;
+  @Builder.Default @Column private Boolean verified = false;
 
   // Usado só para ordenar a busca (maior = aparece antes). null/0 = sem plano.
-  @Builder.Default
-  @Column
-  private Integer priorityWeight = 0;
+  @Builder.Default @Column private Integer priorityWeight = 0;
 
   // Nome do plano ativo, para exibir o selo sem precisar buscar a assinatura à parte.
   @Column private String activePlanName;

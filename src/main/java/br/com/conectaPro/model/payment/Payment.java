@@ -19,10 +19,10 @@ import org.hibernate.annotations.SQLRestriction;
 
 /**
  * Representa uma cobrança gerada para uma demanda (type=DEMANDA) ou para uma assinatura de plano
- * (type=ASSINATURA) — só um dos dois campos (demand/subscription) é preenchido, dependendo do
- * type. É processada por um gateway "fake" (nenhum dinheiro é movido de verdade), mas o modelo já
- * reflete o que uma integração real (ex: Mercado Pago) precisaria: valor total, taxa da
- * plataforma, valor líquido do profissional e status do pagamento.
+ * (type=ASSINATURA) — só um dos dois campos (demand/subscription) é preenchido, dependendo do type.
+ * É processada por um gateway "fake" (nenhum dinheiro é movido de verdade), mas o modelo já reflete
+ * o que uma integração real (ex: Mercado Pago) precisaria: valor total, taxa da plataforma, valor
+ * líquido do profissional e status do pagamento.
  */
 @Entity
 @Table(name = "Payment")
@@ -59,4 +59,3 @@ public class Payment extends AudibleEntity {
 
   private LocalDateTime paidAt;
 }
-
