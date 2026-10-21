@@ -1,9 +1,13 @@
 package br.com.conectaPro.api.user;
 
+import br.com.conectaPro.dto.ProfessionalMapDTO;
+import br.com.conectaPro.dto.PublicUserDTO;
 import br.com.conectaPro.dto.UserResponseDTO;
 import br.com.conectaPro.model.user.AddressUser;
 import br.com.conectaPro.model.user.User;
 import br.com.conectaPro.model.user.UserService;
+import br.com.conectaPro.model.user.UserType;
+import br.com.conectaPro.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -12,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,19 +43,33 @@ public class UserController {
     return new ResponseEntity<>(user, HttpStatus.CREATED);
   }
 
-  @Operation(summary = "Lista todos os usuarios")
+  @Operation(
+      summary = "Lista os profissionais (dados públicos)",
+      description = "Só profissionais e só dados públicos (sem e-mail, telefone, CPF/CNPJ).")
   @GetMapping
-  public ResponseEntity<List<UserResponseDTO>> getAll() {
-    List<UserResponseDTO> response =
-        userService.getAll().stream().map(UserResponseDTO::fromEntity).toList();
+  public ResponseEntity<List<PublicUserDTO>> getAll() {
+    List<PublicUserDTO> response =
+        userService.getAll().stream()
+            .filter(u -> u.getUserType() == UserType.PROFESSIONAL)
+            .map(PublicUserDTO::fromEntity)
+            .toList();
     return ResponseEntity.ok(response);
   }
 
-  @Operation(summary = "Lista um usuario especifico pelo seu ID")
+  @Operation(
+      summary = "Busca um usuario pelo ID",
+      description =
+          "Se o ID for do próprio usuário logado, devolve os dados completos (UserResponseDTO)."
+              + " Para qualquer outro usuário, devolve só o perfil público (PublicUserDTO).")
   @GetMapping("/{id}")
-  public ResponseEntity<UserResponseDTO> getById(@PathVariable Long id) {
+  public ResponseEntity<?> getById(
+      @PathVariable Long id, @AuthenticationPrincipal CustomUserDetails principal) {
     User user = userService.getById(id);
-    return ResponseEntity.ok(UserResponseDTO.fromEntity(user));
+
+    if (id.equals(principal.getUser().getId())) {
+      return ResponseEntity.ok(UserResponseDTO.fromEntity(user));
+    }
+    return ResponseEntity.ok(PublicUserDTO.fromEntity(user));
   }
 
   @Operation(summary = "Atualiza um usuario pelo seu ID")
@@ -90,17 +109,34 @@ public class UserController {
     return ResponseEntity.ok(UserResponseDTO.fromEntity(user));
   }
 
-  @Operation(summary = "Filtro de busca por profissional")
+  @Operation(summary = "Filtro de busca por profissional (dados públicos)")
   @GetMapping("/search")
-  public ResponseEntity<List<UserResponseDTO>> search(
+  public ResponseEntity<List<PublicUserDTO>> search(
       @RequestParam(required = false) String name,
       @RequestParam(required = false) Long categoryId,
       @RequestParam(required = false) Double latitude,
       @RequestParam(required = false) Double longitude,
       @RequestParam(required = false) Double radiusKm) {
     List<User> users = userService.search(name, categoryId, latitude, longitude, radiusKm);
-    List<UserResponseDTO> response = users.stream().map(UserResponseDTO::fromEntity).toList();
+    List<PublicUserDTO> response = users.stream().map(PublicUserDTO::fromEntity).toList();
     return ResponseEntity.ok(response);
+  }
+
+  @Operation(
+      summary = "Profissionais para o mapa",
+      description =
+          "Versão enxuta da busca, sem dados pessoais: devolve só o necessário para desenhar pins"
+              + " (coordenadas arredondadas) e a distância até a origem informada. Ordena por plano"
+              + " (maior primeiro), depois por distância.")
+  @GetMapping("/search/map")
+  public ResponseEntity<List<ProfessionalMapDTO>> searchForMap(
+      @RequestParam(required = false) String name,
+      @RequestParam(required = false) Long categoryId,
+      @RequestParam(required = false) Double latitude,
+      @RequestParam(required = false) Double longitude,
+      @RequestParam(required = false) Double radiusKm) {
+    List<User> users = userService.searchForMap(name, categoryId, latitude, longitude, radiusKm);
+    return ResponseEntity.ok(ProfessionalMapDTO.fromUsers(users, latitude, longitude));
   }
 
   // Endereços

@@ -32,8 +32,8 @@ public class PaymentService {
 
   /**
    * Cria uma nova cobrança para a demanda (deve estar em AGUARDANDO_PAGAMENTO) e retorna o Payment
-   * já com a URL de checkout preenchida via {@link #getCheckoutUrl}. A taxa de plataforma usada é
-   * a do plano ativo do profissional, se houver (ver {@link SubscriptionService}), senão a taxa
+   * já com a URL de checkout preenchida via {@link #getCheckoutUrl}. A taxa de plataforma usada é a
+   * do plano ativo do profissional, se houver (ver {@link SubscriptionService}), senão a taxa
    * padrão configurada.
    */
   @Transactional
@@ -111,8 +111,8 @@ public class PaymentService {
   }
 
   /**
-   * Aprova o pagamento (chamado pela tela/endpoint de simulação hoje; seria chamado pelo webhook
-   * de um gateway real no futuro) e avança a demanda para AGUARDANDO, ou ativa a assinatura,
+   * Aprova o pagamento (chamado pela tela/endpoint de simulação hoje; seria chamado pelo webhook de
+   * um gateway real no futuro) e avança a demanda para AGUARDANDO, ou ativa a assinatura,
    * dependendo do {@link PaymentType}.
    */
   @Transactional
@@ -152,4 +152,3 @@ public class PaymentService {
     return Math.round(valor * 100.0) / 100.0;
   }
 }
-

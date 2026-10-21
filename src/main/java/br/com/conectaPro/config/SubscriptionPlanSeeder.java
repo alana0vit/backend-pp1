@@ -7,10 +7,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 /**
- * Cadastra/atualiza os planos de assinatura padrão a cada início da aplicação. É um "upsert": se
- * o plano ainda não existe, cria; se já existe (pelo nome), atualiza preço/taxa/prioridade pros
- * valores daqui. Isso evita que um valor antigo fique preso no banco depois de uma mudança aqui
- * no código — comum durante o desenvolvimento, enquanto os planos ainda estão sendo ajustados.
+ * Cadastra/atualiza os planos de assinatura padrão a cada início da aplicação. É um "upsert": se o
+ * plano ainda não existe, cria; se já existe (pelo nome), atualiza preço/taxa/prioridade pros
+ * valores daqui. Isso evita que um valor antigo fique preso no banco depois de uma mudança aqui no
+ * código — comum durante o desenvolvimento, enquanto os planos ainda estão sendo ajustados.
  */
 @Component
 public class SubscriptionPlanSeeder implements CommandLineRunner {

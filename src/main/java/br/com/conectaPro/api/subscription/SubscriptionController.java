@@ -44,11 +44,9 @@ public class SubscriptionController {
           "Cria a assinatura (PENDENTE) e já gera a cobrança, retornando o link de checkout — "
               + "mesmo fluxo usado para pagar uma demanda.")
   @PostMapping("/professional/{professionalId}/plan/{planId}/checkout")
-  public ResponseEntity<?> assinar(
-      @PathVariable Long professionalId, @PathVariable Long planId) {
+  public ResponseEntity<?> assinar(@PathVariable Long professionalId, @PathVariable Long planId) {
     try {
-      Subscription subscription =
-          subscriptionService.iniciarAssinatura(professionalId, planId);
+      Subscription subscription = subscriptionService.iniciarAssinatura(professionalId, planId);
       Payment payment = paymentService.criarCheckoutAssinatura(subscription);
       String checkoutUrl = paymentService.getCheckoutUrl(payment);
 

@@ -1,6 +1,7 @@
 package br.com.conectaPro.api.demand;
 
 import br.com.conectaPro.dto.AcceptDemandDTO;
+import br.com.conectaPro.dto.DemandResponseDTO;
 import br.com.conectaPro.dto.ReassignRequestDTO;
 import br.com.conectaPro.dto.StatusUpdateDTO;
 import br.com.conectaPro.model.category.Category;
@@ -11,6 +12,7 @@ import br.com.conectaPro.model.demand.DemandStatus;
 import br.com.conectaPro.model.user.AddressUser;
 import br.com.conectaPro.model.user.User;
 import br.com.conectaPro.model.user.UserService;
+import br.com.conectaPro.security.CustomUserDetails;
 import br.com.conectaPro.util.Util;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,6 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -86,23 +89,27 @@ public class DemandController {
       demandNew.setImgUrl(urls);
 
       Demand demand = demandService.save(demandNew);
-      return new ResponseEntity<>(demand, HttpStatus.CREATED);
+      return new ResponseEntity<>(DemandResponseDTO.fromEntity(demand), HttpStatus.CREATED);
     } catch (NoSuchElementException e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST)
           .body("Um dos IDs informados (Cliente, Profissional, Categoria ou Endereço) não existe.");
     }
   }
 
-  @Operation(summary = "Lista todas as demandas")
+  @Operation(
+      summary = "Lista as demandas do usuário logado",
+      description = "Só as demandas em que o usuário é o cliente ou o profissional.")
   @GetMapping("/user")
-  public List<Demand> getAll() {
-    return demandService.getAll();
+  public List<DemandResponseDTO> getAll(@AuthenticationPrincipal CustomUserDetails principal) {
+    return DemandResponseDTO.fromList(demandService.getAllForUser(principal.getUser().getId()));
   }
 
   @Operation(summary = "Lista uma demanda especifica pelo ID")
   @GetMapping("/user/{id}")
-  public Demand getById(@PathVariable @NonNull Long id) {
-    return demandService.getById(id);
+  public DemandResponseDTO getById(
+      @PathVariable @NonNull Long id, @AuthenticationPrincipal CustomUserDetails principal) {
+    return DemandResponseDTO.fromEntity(
+        demandService.getByIdForUser(id, principal.getUser().getId()));
   }
 
   @Operation(summary = "Atualiza campos especificos da demanda")
@@ -151,11 +158,11 @@ public class DemandController {
 
   @Operation(summary = "Permite atualizar o profissional após a demanda ser rejeitada")
   @PatchMapping("/{id}/reassign")
-  public ResponseEntity<Demand> reassignProfessional(
+  public ResponseEntity<DemandResponseDTO> reassignProfessional(
       @PathVariable @NonNull Long id, @RequestBody ReassignRequestDTO request) {
 
     Demand updatedDemand = demandService.reassign(id, request.professionalId());
-    return ResponseEntity.ok(updatedDemand);
+    return ResponseEntity.ok(DemandResponseDTO.fromEntity(updatedDemand));
   }
 
   @Operation(summary = "Profissional aceita a demanda e define o valor final do serviço")
@@ -164,7 +171,7 @@ public class DemandController {
 
     try {
       Demand updated = demandService.acceptWithValue(id, request.getFinalValue());
-      return ResponseEntity.ok(updated);
+      return ResponseEntity.ok(DemandResponseDTO.fromEntity(updated));
     } catch (NoSuchElementException e) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     } catch (IllegalStateException e) {
@@ -174,11 +181,11 @@ public class DemandController {
 
   @Operation(summary = "Atualiza o status da demanda")
   @PatchMapping("/{id}/status")
-  public ResponseEntity<Demand> updateStatus(
+  public ResponseEntity<DemandResponseDTO> updateStatus(
       @PathVariable Long id, @RequestBody StatusUpdateDTO request) {
 
     Demand updated = demandService.updateStatus(id, request.getStatus());
-    return ResponseEntity.ok(updated);
+    return ResponseEntity.ok(DemandResponseDTO.fromEntity(updated));
   }
 
   @Operation(summary = "Remove uma imagem especifica de uma demanda")
@@ -187,7 +194,7 @@ public class DemandController {
 
     try {
       Demand updated = demandService.removeImage(id, nomeArquivo);
-      return ResponseEntity.ok(updated);
+      return ResponseEntity.ok(DemandResponseDTO.fromEntity(updated));
     } catch (NoSuchElementException e) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }

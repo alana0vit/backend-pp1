@@ -96,8 +96,8 @@ public class Util {
 
   /**
    * Baixa do R2 o conteúdo (bytes + metadados) do arquivo com o nome informado. Usado pelo endpoint
-   * que serve as imagens (GET). Retorna null caso o nome seja inválido ou o objeto não exista
-   * no bucket.
+   * que serve as imagens (GET). Retorna null caso o nome seja inválido ou o objeto não exista no
+   * bucket.
    */
   public static ResponseInputStream<GetObjectResponse> baixarImagem(String nomeArquivo) {
     String key = validarEChavear(nomeArquivo);
